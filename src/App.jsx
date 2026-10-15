@@ -386,7 +386,9 @@ function App() {
       setRollingValue(selectedValue)
       setProfile((current) => ({ ...current, [field.key]: selectedValue }))
       setCurrentProfileIndex((current) => current + 1)
-      setIsSpinning(false)
+      if (currentProfileIndex === profileFields.length - 1) {
+        setIsSpinning(false)
+      }
     }, 1400)
 
     return () => {
@@ -473,7 +475,7 @@ function App() {
               onClick={() => setIsSpinning(true)}
               className="mt-6 w-full rounded-lg border border-sky-400/40 bg-sky-400/10 px-5 py-3 font-semibold text-sky-200 transition hover:bg-sky-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-60"
             >
-              {isSpinning ? '抽選中…' : `${profileFields[currentProfileIndex].label}のルーレットを回す`}
+              {isSpinning ? '抽選中…' : 'すべてのルーレットを回す'}
             </button>
           )}
         </section>
