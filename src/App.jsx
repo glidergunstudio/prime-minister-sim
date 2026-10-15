@@ -10,6 +10,8 @@ const profileFields = [
   { key: 'past', label: '消せない過去', options: ['若手時代の失言', '過去の公約未達', '政治資金の説明不足', '強引な党内運営', '古い発言の再燃'] },
 ]
 
+const primeMinisterNames = ['高橋 誠', '山本 由美', '中村 翔太', '小林 美月', '藤田 健']
+
 const ideologies = [
   'とにかくクリーンな世の中を実現',
   '経済成長を最優先する',
@@ -417,6 +419,9 @@ function OpinionDetails({ support }) {
 
 function App() {
   const [screen, setScreen] = useState('intro')
+  const [primeMinisterName, setPrimeMinisterName] = useState(
+    () => primeMinisterNames[Math.floor(Math.random() * primeMinisterNames.length)],
+  )
   const [profile, setProfile] = useState({})
   const [ideology, setIdeology] = useState(ideologies[0])
   const [promises, setPromises] = useState(promiseOptions.slice(0, 3))
@@ -504,6 +509,16 @@ function App() {
     return (
       <main className="min-h-screen bg-[#090d16] px-4 py-8 text-slate-100 sm:px-6">
         <section className="mx-auto max-w-2xl">
+          <label htmlFor="prime-minister-name" className="mb-2 block text-sm font-semibold text-white">
+            総理大臣の名前
+          </label>
+          <input
+            id="prime-minister-name"
+            type="text"
+            value={primeMinisterName}
+            onChange={(changeEvent) => setPrimeMinisterName(changeEvent.target.value)}
+            className="mb-6 w-full rounded-xl border border-white/15 bg-[#111827] px-4 py-3 text-base text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+          />
           <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">総理プロフィール</p>
           <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">あなたの総理像を決める</h1>
           <p className="mt-2 text-sm leading-6 text-slate-400">
@@ -913,7 +928,7 @@ function App() {
     <div className="flex h-dvh flex-col overflow-hidden bg-[#090d16] text-slate-100">
       <header className="shrink-0 border-b border-white/10 bg-[#0d1320]">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2.5 px-2.5 py-2.5 sm:px-4">
-          <h1 className="text-sm font-bold text-white sm:text-base">未来創造内閣</h1>
+          <h1 className="text-sm font-bold text-white sm:text-base">{primeMinisterName}内閣</h1>
           <div className="flex shrink-0 flex-col items-end gap-1">
             <div className="flex flex-wrap items-center justify-end gap-1.5">
               <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1">
