@@ -1,4 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+const profileFields = [
+  { key: 'hometown', label: '出身地', options: ['北海道', '東京都', '大阪府', '福岡県', '長野県'] },
+  { key: 'district', label: '選挙区', options: ['北海道3区', '東京12区', '神奈川2区', '大阪5区', '福岡1区'] },
+  { key: 'background', label: '出身階層', options: ['地方都市の公務員家庭', '農家の家庭', '町工場を営む家庭', '都市部の会社員家庭', '政治家の家系'] },
+  { key: 'career', label: '前職', options: ['弁護士', '地方自治体職員', '新聞記者', '会社経営者', '大学教授'] },
+  { key: 'trait', label: '特性', options: ['調整力に優れる', '決断が早い', '演説が得意', '数字に強い', '粘り強い'] },
+  { key: 'election', label: '選出経緯', options: ['党内選挙で勝利', '連立合意で指名', '世論の後押し', '総裁選で逆転', '緊急の党内一致'] },
+  { key: 'past', label: '消せない過去', options: ['若手時代の失言', '過去の公約未達', '政治資金の説明不足', '強引な党内運営', '古い発言の再燃'] },
+]
 
 const metrics = [
   { key: 'public', label: '世論', color: 'bg-sky-400', text: 'text-sky-300' },
@@ -94,6 +104,11 @@ const getNextEventIndex = (currentIndex) => {
 }
 
 function App() {
+  const [screen, setScreen] = useState('intro')
+  const [profile, setProfile] = useState({})
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
+  const [rollingValue, setRollingValue] = useState('')
+  const [isSpinning, setIsSpinning] = useState(false)
   const [status, setStatus] = useState({
     public: 50,
     party: 50,
@@ -107,6 +122,137 @@ function App() {
   const event = events[eventIndex]
   const gameMonth = turn - 1
   const gameDate = `${2025 + Math.floor(gameMonth / 12)}年${(gameMonth % 12) + 1}月`
+
+  useEffect(() => {
+    if (!isSpinning) return
+
+    const field = profileFields[currentProfileIndex]
+    const intervalId = window.setInterval(() => {
+      setRollingValue(field.options[Math.floor(Math.random() * field.options.length)])
+    }, 90)
+    const timeoutId = window.setTimeout(() => {
+      const selectedValue = field.options[Math.floor(Math.random() * field.options.length)]
+      setRollingValue(selectedValue)
+      setProfile((current) => ({ ...current, [field.key]: selectedValue }))
+      setCurrentProfileIndex((current) => current + 1)
+      setIsSpinning(false)
+    }, 1400)
+
+    return () => {
+      window.clearInterval(intervalId)
+      window.clearTimeout(timeoutId)
+    }
+  }, [isSpinning, currentProfileIndex])
+
+  if (screen === 'intro') {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-10 bg-[#090d16] px-6 text-center text-slate-100">
+        <p className="text-xl font-semibold leading-relaxed sm:text-3xl">
+          2026年10月、国会で内閣総理大臣に指名された
+        </p>
+        <button
+          type="button"
+          onClick={() => setScreen('profile')}
+          className="rounded-lg border border-sky-400/40 bg-sky-400/10 px-6 py-3 font-semibold text-sky-200 transition hover:bg-sky-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        >
+          次へ
+        </button>
+      </main>
+    )
+  }
+
+  if (screen === 'profile') {
+    const allProfileFieldsSelected = currentProfileIndex === profileFields.length
+
+    return (
+      <main className="min-h-screen bg-[#090d16] px-4 py-8 text-slate-100 sm:px-6">
+        <section className="mx-auto max-w-2xl">
+          <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">総理プロフィール</p>
+          <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">あなたの総理像を決める</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            ルーレットを回して、総理としての背景や特性を決めましょう。
+          </p>
+
+          <ol className="mt-6 space-y-2">
+            {profileFields.map((field, index) => {
+              const isCurrentField = index === currentProfileIndex
+              const isSelected = profile[field.key] !== undefined
+              const value = isSelected
+                ? profile[field.key]
+                : isCurrentField && isSpinning
+                  ? rollingValue
+                  : '未決定'
+
+              return (
+                <li
+                  key={field.key}
+                  className={`flex min-h-16 items-center justify-between gap-4 rounded-xl border px-4 py-3 ${
+                    isCurrentField ? 'border-sky-400/40 bg-sky-400/[0.06]' : 'border-white/10 bg-white/[0.025]'
+                  }`}
+                >
+                  <span className="text-sm font-semibold text-slate-300">{field.label}</span>
+                  <span
+                    aria-live={isCurrentField && isSpinning ? 'off' : 'polite'}
+                    className={`text-right text-sm font-semibold sm:text-base ${
+                      isSelected || (isCurrentField && isSpinning) ? 'text-white' : 'text-slate-600'
+                    } ${isCurrentField && isSpinning ? 'animate-pulse' : ''}`}
+                  >
+                    {value}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+
+          {allProfileFieldsSelected ? (
+            <button
+              type="button"
+              onClick={() => setScreen('cabinet')}
+              className="mt-6 w-full rounded-lg bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              組閣
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={isSpinning}
+              onClick={() => setIsSpinning(true)}
+              className="mt-6 w-full rounded-lg border border-sky-400/40 bg-sky-400/10 px-5 py-3 font-semibold text-sky-200 transition hover:bg-sky-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-60"
+            >
+              {isSpinning ? '抽選中…' : `${profileFields[currentProfileIndex].label}のルーレットを回す`}
+            </button>
+          )}
+        </section>
+      </main>
+    )
+  }
+
+  if (screen === 'cabinet') {
+    return (
+      <main className="min-h-screen bg-[#090d16] px-4 py-8 text-slate-100 sm:px-6">
+        <section className="mx-auto max-w-2xl rounded-2xl border border-white/10 bg-[#111827] p-6 sm:p-8">
+          <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">内閣総理大臣</p>
+          <h1 className="mt-2 text-3xl font-bold text-white">組閣</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">総理のプロフィールが決まりました。これから内閣を発足します。</p>
+          <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+            {profileFields.map((field) => (
+              <div key={field.key} className="rounded-lg border border-white/10 bg-white/[0.025] p-3">
+                <dt className="text-xs text-slate-400">{field.label}</dt>
+                <dd className="mt-1 font-semibold text-white">{profile[field.key]}</dd>
+              </div>
+            ))}
+          </dl>
+          <button
+            type="button"
+            onClick={() => setScreen('office')}
+            className="mt-6 w-full rounded-lg bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+          >
+            執務室へ
+          </button>
+        </section>
+      </main>
+    )
+  }
 
   const makeDecision = (choice) => {
     setStatus((current) =>
