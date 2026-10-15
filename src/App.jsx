@@ -459,8 +459,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100">
-      <header className="border-b border-white/10 bg-[#0d1320]">
+    <div className="flex h-dvh flex-col overflow-hidden bg-[#090d16] text-slate-100">
+      <header className="shrink-0 border-b border-white/10 bg-[#0d1320]">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2.5 px-2.5 py-2.5 sm:px-4">
           <h1 className="text-sm font-bold text-white sm:text-base">未来創造内閣</h1>
           <div className="flex shrink-0 flex-col items-end gap-1">
@@ -484,8 +484,8 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-3.5 px-2.5 py-3 sm:px-4 sm:py-4.5">
-        <section aria-label="首相官邸と内閣の状況" className="grid gap-2 lg:grid-cols-[1.15fr_0.85fr]">
+      <main className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden space-y-3.5 px-2.5 py-3 sm:px-4 sm:py-4.5">
+        <section aria-label="首相官邸と内閣の状況" className="grid shrink-0 gap-2 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#182437] to-[#101723] p-2.5 sm:min-h-64 sm:p-3.5">
             <div className="relative z-10">
               <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">首相官邸 · 執務室</p>
@@ -505,9 +505,6 @@ function App() {
           </div>
 
           <section aria-label="内閣の状況" className="rounded-2xl border border-white/10 bg-[#111827] p-2 sm:p-2.5">
-            <div className="mb-2 flex justify-end">
-              <span className="text-xs text-slate-500">TURN {String(turn).padStart(2, '0')}</span>
-            </div>
             <div className="grid grid-cols-5 gap-1.5">
               {metrics.map((metric) => (
                 <button
@@ -542,7 +539,7 @@ function App() {
           </section>
         </section>
 
-        <section aria-label="ゲームの進行速度" className="flex items-center justify-end gap-1.5">
+        <section aria-label="ゲームの進行速度" className="flex shrink-0 items-center justify-end gap-1.5">
           <span className="mr-1 text-xs text-slate-400">進行速度</span>
           {[1, 2, 3].map((speed) => (
             <button
@@ -561,15 +558,15 @@ function App() {
           ))}
         </section>
 
-        <section aria-label="イベントのタイムライン">
-          <div className="mb-2 flex items-center justify-between">
+        <section aria-label="イベントのタイムライン" className="flex min-h-0 flex-1 flex-col">
+          <div className="mb-2 flex shrink-0 items-center justify-between">
             <div className="flex items-center gap-1">
               <span className="h-4 w-1 rounded-full bg-rose-400" />
               <h2 className="text-sm font-bold tracking-wider text-slate-200">政権のタイムライン</h2>
             </div>
             <span className="text-xs text-slate-500">{history.length + 1}件</span>
           </div>
-          <ol className="relative space-y-1.5 before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-white/10">
+          <ol className="relative min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-white/10">
             <li className="relative pl-10">
               <span className="absolute left-[9px] top-5 size-3.5 rounded-full border-[3px] border-[#090d16] bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.55)]" />
               <article className="rounded-xl border border-rose-400/20 bg-[#111827] p-2 sm:p-2.5">
@@ -616,7 +613,7 @@ function App() {
           </ol>
         </section>
 
-        <p className="pb-1.5 text-center text-[11px] tracking-wide text-slate-600">
+        <p className="shrink-0 pb-1.5 text-center text-[11px] tracking-wide text-slate-600">
           DECISIONS SHAPE THE FUTURE · あなたの選択が国の未来をつくる
         </p>
       </main>
