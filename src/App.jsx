@@ -133,24 +133,13 @@ function App() {
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100">
       <header className="border-b border-white/10 bg-[#0d1320]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <div className="flex items-center gap-4">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-amber-300/20 bg-amber-300/10 text-xl font-bold text-amber-300">
-              政
-            </div>
-            <div>
-              <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">日本国政府</p>
-              <h1 className="mt-1 text-xl font-bold tracking-wide text-white sm:text-2xl">
-                第108代内閣総理大臣
-              </h1>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2.5 px-2.5 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1">
               <span className="text-xs text-slate-400">在任</span>
-              <span className="ml-3 font-semibold tabular-nums text-white">{turn}ヶ月</span>
+              <span className="ml-1.5 font-semibold tabular-nums text-white">{turn}ヶ月</span>
             </div>
-            <div className="flex items-center gap-2 rounded-lg border border-amber-300/20 bg-amber-300/10 px-4 py-2 text-sm text-amber-200">
+            <div className="flex items-center gap-1 rounded-lg border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-sm text-amber-200">
               <span className="text-amber-300">◆</span>
               <span className="font-semibold">公約</span>
               <span className="hidden text-amber-100/70 sm:inline">暮らしと未来を守る</span>
@@ -159,12 +148,12 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-7 px-5 py-6 sm:px-8 sm:py-9">
-        <section aria-label="首相官邸と内閣の状況" className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#182437] to-[#101723] p-5 sm:min-h-64 sm:p-7">
+      <main className="mx-auto max-w-6xl space-y-3.5 px-2.5 py-3 sm:px-4 sm:py-4.5">
+        <section aria-label="首相官邸と内閣の状況" className="grid gap-2 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#182437] to-[#101723] p-2.5 sm:min-h-64 sm:p-3.5">
             <div className="relative z-10">
               <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">首相官邸 · 執務室</p>
-              <h2 className="mt-2 text-lg font-bold text-white sm:text-xl">国の未来を決める場所</h2>
+              <h2 className="mt-1 text-lg font-bold text-white sm:text-xl">国の未来を決める場所</h2>
             </div>
             <svg
               aria-hidden="true"
@@ -200,23 +189,23 @@ function App() {
               <path d="M211 207h119l13 15H197z" fill="#171e28" />
               <path d="M227 191h86v16h-86z" fill="#29384a" />
             </svg>
-            <div className="absolute bottom-4 right-5 rounded-full border border-white/10 bg-[#0b111bd9] px-3 py-1 text-[10px] tracking-widest text-slate-400">
+            <div className="absolute bottom-2 right-2.5 rounded-full border border-white/10 bg-[#0b111bd9] px-1.5 py-0.5 text-[10px] tracking-widest text-slate-400">
               PRIME MINISTER'S OFFICE
             </div>
           </div>
 
-          <section aria-label="内閣の状況" className="rounded-2xl border border-white/10 bg-[#111827] p-4 sm:p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          <section aria-label="内閣の状況" className="rounded-2xl border border-white/10 bg-[#111827] p-2 sm:p-2.5">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-1">
                 <span className="h-4 w-1 rounded-full bg-sky-400" />
                 <h2 className="text-sm font-bold tracking-wider text-slate-200">内閣の状況</h2>
               </div>
               <span className="text-xs text-slate-500">TURN {String(turn).padStart(2, '0')}</span>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+            <div className="grid grid-cols-1 gap-y-2.5">
               {metrics.map((metric) => (
                 <div key={metric.key}>
-                  <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="mb-1 flex items-center justify-between gap-1">
                     <span className="text-xs font-medium text-slate-300 sm:text-sm">{metric.label}</span>
                     <span className={`text-lg font-bold tabular-nums ${metric.text}`}>
                       {status[metric.key]}
@@ -242,32 +231,32 @@ function App() {
         </section>
 
         <section aria-label="イベントのタイムライン">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-1">
               <span className="h-4 w-1 rounded-full bg-rose-400" />
               <h2 className="text-sm font-bold tracking-wider text-slate-200">政権のタイムライン</h2>
             </div>
             <span className="text-xs text-slate-500">{history.length + 1}件</span>
           </div>
-          <ol className="relative space-y-3 before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-white/10">
+          <ol className="relative space-y-1.5 before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-white/10">
             <li className="relative pl-10">
               <span className="absolute left-[9px] top-5 size-3.5 rounded-full border-[3px] border-[#090d16] bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.55)]" />
-              <article className="rounded-xl border border-rose-400/20 bg-[#111827] p-4 sm:p-5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
+              <article className="rounded-xl border border-rose-400/20 bg-[#111827] p-2 sm:p-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-1">
+                  <div className="flex items-center gap-1">
                     <span className="text-xs font-semibold tabular-nums text-slate-500">TURN {String(turn).padStart(2, '0')}</span>
-                    <span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400">
+                    <span className="rounded-full border border-white/10 px-1.5 py-0.5 text-[11px] text-slate-400">
                       {event.category}
                     </span>
                   </div>
                   <span className="text-[11px] font-semibold tracking-wide text-rose-300">対応待ち</span>
                 </div>
-                <h3 className="mt-3 text-lg font-bold text-white">{event.title}</h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-400">{event.description}</p>
+                <h3 className="mt-1.5 text-lg font-bold text-white">{event.title}</h3>
+                <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-400">{event.description}</p>
                 <button
                   type="button"
                   onClick={() => setIsDecisionOpen(true)}
-                  className="mt-4 rounded-lg border border-sky-400/30 bg-sky-400/[0.08] px-4 py-2 text-sm font-semibold text-sky-200 transition hover:border-sky-300/60 hover:bg-sky-400/[0.14] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                  className="mt-2 rounded-lg border border-sky-400/30 bg-sky-400/[0.08] px-2 py-1 text-sm font-semibold text-sky-200 transition hover:border-sky-300/60 hover:bg-sky-400/[0.14] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                 >
                   議題を確認して判断する <span aria-hidden="true">→</span>
                 </button>
@@ -276,28 +265,28 @@ function App() {
             {history.map((item) => (
               <li key={item.turn} className="relative pl-10">
                 <span className="absolute left-[10px] top-5 size-3 rounded-full border-2 border-[#090d16] bg-violet-400" />
-                <article className="rounded-xl border border-white/[0.07] bg-[#0e1420] px-4 py-4 sm:px-5">
-                  <div className="flex flex-wrap items-center gap-2">
+                <article className="rounded-xl border border-white/[0.07] bg-[#0e1420] px-2 py-2 sm:px-2.5">
+                  <div className="flex flex-wrap items-center gap-1">
                     <span className="text-xs font-semibold tabular-nums text-slate-500">TURN {String(item.turn).padStart(2, '0')}</span>
                     <span className="text-[11px] text-slate-500">{item.category}</span>
-                    <span className="ml-auto rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300">決定済み</span>
+                    <span className="ml-auto rounded-full bg-emerald-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">決定済み</span>
                   </div>
-                  <h3 className="mt-2 text-sm font-semibold text-slate-200">{item.title}</h3>
-                  <p className="mt-1 text-xs leading-5 text-slate-400">{item.choice} — {item.detail}</p>
+                  <h3 className="mt-1 text-sm font-semibold text-slate-200">{item.title}</h3>
+                  <p className="mt-0.5 text-xs leading-5 text-slate-400">{item.choice} — {item.detail}</p>
                 </article>
               </li>
             ))}
           </ol>
         </section>
 
-        <p className="pb-3 text-center text-[11px] tracking-wide text-slate-600">
+        <p className="pb-1.5 text-center text-[11px] tracking-wide text-slate-600">
           DECISIONS SHAPE THE FUTURE · あなたの選択が国の未来をつくる
         </p>
       </main>
 
       {isDecisionOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-5"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-2.5"
           onClick={() => setIsDecisionOpen(false)}
         >
           <section
@@ -308,12 +297,12 @@ function App() {
             onKeyDown={(keyEvent) => {
               if (keyEvent.key === 'Escape') setIsDecisionOpen(false)
             }}
-            className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border border-white/10 bg-[#111827] p-5 shadow-2xl shadow-black/50 sm:max-w-2xl sm:rounded-2xl sm:p-7"
+            className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border border-white/10 bg-[#111827] p-2.5 shadow-2xl shadow-black/50 sm:max-w-2xl sm:rounded-2xl sm:p-3.5"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-xs font-semibold tracking-[0.18em] text-rose-300">直面する課題 · {event.category}</p>
-                <h2 id="decision-title" className="mt-2 text-xl font-bold text-white sm:text-2xl">{event.title}</h2>
+                <h2 id="decision-title" className="mt-1 text-xl font-bold text-white sm:text-2xl">{event.title}</h2>
               </div>
               <button
                 type="button"
@@ -325,23 +314,23 @@ function App() {
                 ×
               </button>
             </div>
-            <p className="mt-4 text-sm leading-7 text-slate-300">{event.description}</p>
-            <div className="mt-6">
-              <p className="mb-3 text-xs font-semibold tracking-wider text-slate-400">あなたの決断</p>
-              <div className="grid gap-3">
+            <p className="mt-2 text-sm leading-7 text-slate-300">{event.description}</p>
+            <div className="mt-3">
+              <p className="mb-1.5 text-xs font-semibold tracking-wider text-slate-400">あなたの決断</p>
+              <div className="grid gap-1.5">
                 {event.choices.map((choice, index) => (
                   <button
                     key={choice.label}
                     type="button"
                     onClick={() => makeDecision(choice)}
-                    className="group flex w-full items-start gap-4 rounded-xl border border-white/10 bg-white/[0.025] p-4 text-left transition hover:border-sky-400/50 hover:bg-sky-400/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:p-5"
+                    className="group flex w-full items-start gap-2 rounded-xl border border-white/10 bg-white/[0.025] p-2 text-left transition hover:border-sky-400/50 hover:bg-sky-400/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:p-2.5"
                   >
                     <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-slate-800 text-sm font-bold text-slate-300 transition group-hover:border-sky-400/30 group-hover:text-sky-300">
                       {String.fromCharCode(65 + index)}
                     </span>
                     <span>
                       <span className="block text-sm font-semibold text-slate-100 sm:text-base">{choice.label}</span>
-                      <span className="mt-1 block text-xs leading-5 text-slate-400 sm:text-sm">{choice.detail}</span>
+                      <span className="mt-0.5 block text-xs leading-5 text-slate-400 sm:text-sm">{choice.detail}</span>
                     </span>
                     <span aria-hidden="true" className="ml-auto pt-1 text-slate-600 transition group-hover:translate-x-1 group-hover:text-sky-300">→</span>
                   </button>
