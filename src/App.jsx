@@ -37,13 +37,55 @@ const cabinetPostDescriptions = {
 }
 
 const cabinetCandidates = [
-  { id: 'aoi', name: '青井 さくら', district: '東京5区', experience: '当選6回', influence: 60, administration: 80, debate: 20, note: '身体検査：怪しい噂がある' },
-  { id: 'kanda', name: '神田 健一', district: '大阪3区', experience: '当選4回', influence: 72, administration: 68, debate: 74, note: '調整力に優れる' },
-  { id: 'mori', name: '森 由美子', district: '北海道2区', experience: '当選3回', influence: 55, administration: 86, debate: 63, note: '実務経験が豊富' },
-  { id: 'sato', name: '佐藤 大輔', district: '福岡1区', experience: '当選5回', influence: 81, administration: 59, debate: 70, note: '党内の人脈が広い' },
-  { id: 'ishida', name: '石田 美咲', district: '京都2区', experience: '当選2回', influence: 68, administration: 73, debate: 88, note: '発信力に定評がある' },
-  { id: 'noda', name: '野田 誠', district: '愛知7区', experience: '当選3回', influence: 74, administration: 77, debate: 58, note: '民間企業での経験がある' },
-  { id: 'suzuki', name: '鈴木 玲奈', district: '神奈川4区', experience: '当選2回', influence: 62, administration: 82, debate: 76, note: '政策立案に詳しい' },
+  {
+    id: 'aoi', name: '青井 さくら', district: '東京5区', experience: '当選6回',
+    party: '政和党', chamber: '衆議院', age: 52, portraitColor: '#31516b',
+    influence: 60, administration: 80, debate: 20,
+    note: '子育て支援策の立案を主導。党内の政策調整にも携わる。',
+    vetting: '政治資金収支報告の記載漏れを訂正済み。説明は完了している。',
+  },
+  {
+    id: 'kanda', name: '神田 健一', district: '大阪3区', experience: '当選4回',
+    party: '国民改革党', chamber: '衆議院', age: 61, portraitColor: '#66506e',
+    influence: 72, administration: 68, debate: 74,
+    note: '複数の党との協議をまとめた経験があり、調整力に優れる。',
+    vetting: '目立った問題は確認されていない。関係団体との会合記録を公開。',
+  },
+  {
+    id: 'mori', name: '森 由美子', district: '北海道選挙区', experience: '当選3回',
+    party: '政和党', chamber: '参議院', age: 48, portraitColor: '#49634e',
+    influence: 55, administration: 86, debate: 63,
+    note: '自治体の財政再建に関わった経験があり、行政実務に詳しい。',
+    vetting: '過去の発言を含め、懸念事項は確認されていない。',
+  },
+  {
+    id: 'sato', name: '佐藤 大輔', district: '福岡1区', experience: '当選5回',
+    party: '国民改革党', chamber: '衆議院', age: 54, portraitColor: '#755448',
+    influence: 81, administration: 59, debate: 70,
+    note: '幅広い党内人脈を持ち、地方組織との連携にも強い。',
+    vetting: '後援会の会計処理について確認済み。指摘事項への対応は完了。',
+  },
+  {
+    id: 'ishida', name: '石田 美咲', district: '京都府選挙区', experience: '当選2回',
+    party: 'みらい党', chamber: '参議院', age: 43, portraitColor: '#76576b',
+    influence: 68, administration: 73, debate: 88,
+    note: '広報分野の経験を生かした発信力に定評がある。',
+    vetting: '利害関係や過去の報道を確認。特段の懸念は見つかっていない。',
+  },
+  {
+    id: 'noda', name: '野田 誠', district: '民間出身', experience: '元企業経営者',
+    party: '無所属', chamber: '民間', age: 46, portraitColor: '#44677a',
+    influence: 74, administration: 77, debate: 58,
+    note: '企業経営と地域雇用の創出に携わり、民間の実務経験が豊富。',
+    vetting: '経営企業の取引関係と資産を確認。公職との利益相反はなし。',
+  },
+  {
+    id: 'suzuki', name: '鈴木 玲奈', district: '神奈川4区', experience: '当選2回',
+    party: 'みらい党', chamber: '衆議院', age: 39, portraitColor: '#6d6347',
+    influence: 62, administration: 82, debate: 76,
+    note: '社会保障分野の政策立案に詳しく、超党派の議論にも参加。',
+    vetting: '資金報告と公的発言を確認。現時点で問題は確認されていない。',
+  },
 ]
 
 const metrics = [
@@ -256,6 +298,25 @@ function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice',
       <circle cx="443" cy="176" r="7" fill="#c94b50" />
       <path d="M211 207h119l13 15H197z" fill="#171e28" />
       <path d="M227 191h86v16h-86z" fill="#29384a" />
+    </svg>
+  )
+}
+
+function CandidatePortrait({ candidate, className = '' }) {
+  return (
+    <svg
+      role="img"
+      aria-label={`${candidate.name}のイメージ画像`}
+      viewBox="0 0 96 96"
+      className={className}
+    >
+      <circle cx="48" cy="48" r="48" fill={candidate.portraitColor} />
+      <path d="M15 96c2-19 15-29 33-29s31 10 33 29" fill="#172638" />
+      <path d="M39 62h18v15H39z" fill="#d9a17c" />
+      <ellipse cx="48" cy="43" rx="21" ry="25" fill="#f0c4a2" />
+      <path d="M27 44c-3-19 7-32 22-32 16 0 24 12 21 31-4-9-9-14-17-16-7 7-15 10-26 10z" fill="#28252c" />
+      <path d="M39 45h2m14 0h2" stroke="#44322d" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M43 56c3 2 7 2 10 0" fill="none" stroke="#995f56" strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
@@ -676,14 +737,19 @@ function App() {
             </div>
 
             <div className="mt-3 flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-sky-300/25 bg-sky-300/[0.03] p-2.5 text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-sky-200/30 bg-slate-800 text-3xl font-bold text-sky-200">
-                {assignedCandidate?.name.slice(0, 1) ?? '?'}
-              </div>
+              {assignedCandidate ? (
+                <CandidatePortrait candidate={assignedCandidate} className="h-20 w-20 rounded-full border border-sky-200/30" />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full border border-sky-200/30 bg-slate-800 text-3xl font-bold text-sky-200">?</div>
+              )}
               <p className="mt-2 text-lg font-semibold text-white">
                 {assignedCandidate?.name ?? '未任命'}
               </p>
               {assignedCandidate && (
-                <p className="mt-1 text-sm text-slate-400">{assignedCandidate.district}・{assignedCandidate.experience}</p>
+                <>
+                  <p className="mt-1 text-sm text-slate-300">{assignedCandidate.party}・{assignedCandidate.chamber}・{assignedCandidate.age}歳</p>
+                  <p className="mt-1 text-sm text-slate-400">{assignedCandidate.district}・{assignedCandidate.experience}</p>
+                </>
               )}
             </div>
             {assignedCandidate && (
@@ -749,24 +815,30 @@ function App() {
                       : 'border-white/10 bg-white/[0.025] hover:bg-white/[0.06]'
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-800 text-2xl font-bold text-sky-200">
-                      {currentCandidate.name.slice(0, 1)}
-                    </div>
-                    <div>
+                  <div className="flex items-center gap-3">
+                    <CandidatePortrait candidate={currentCandidate} className="h-16 w-16 shrink-0 rounded-full" />
+                    <div className="min-w-0 flex-1">
                       <p className="text-lg font-bold text-white">{currentCandidate.name}</p>
                       <p className="mt-1 text-sm text-slate-300">{currentCandidate.district}・{currentCandidate.experience}</p>
                     </div>
-                    <span className="ml-auto text-sm font-semibold text-sky-200">
+                    <span className="shrink-0 text-sm font-semibold text-sky-200">
                       {cabinetCandidateId === currentCandidate.id ? '選択中' : '選択する'}
                     </span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                    <span className="rounded-full bg-white/5 px-2 py-1 text-slate-300">政党：{currentCandidate.party}</span>
+                    <span className="rounded-full bg-white/5 px-2 py-1 text-slate-300">所属院：{currentCandidate.chamber}</span>
+                    <span className="rounded-full bg-white/5 px-2 py-1 text-slate-300">年齢：{currentCandidate.age}歳</span>
                   </div>
                   <div className="mt-2 grid grid-cols-3 gap-2 text-center text-sm">
                     <p><span className="block text-slate-400">影響力</span>{currentCandidate.influence}</p>
                     <p><span className="block text-slate-400">実務力</span>{currentCandidate.administration}</p>
                     <p><span className="block text-slate-400">答弁力</span>{currentCandidate.debate}</p>
                   </div>
-                  <p className="mt-2 border-t border-white/10 pt-2 text-sm text-slate-300">{currentCandidate.note}</p>
+                  <div className="mt-2 border-t border-white/10 pt-2 text-sm leading-5 text-slate-300">
+                    <p><span className="font-semibold text-slate-200">補足情報：</span>{currentCandidate.note}</p>
+                    <p className="mt-1"><span className="font-semibold text-slate-200">身体検査：</span>{currentCandidate.vetting}</p>
+                  </div>
                 </button>
                 <button
                   type="button"
