@@ -5,6 +5,7 @@ const metrics = [
   { key: 'party', label: '党内支持', color: 'bg-violet-400', text: 'text-violet-300' },
   { key: 'happiness', label: '国民幸福度', color: 'bg-emerald-400', text: 'text-emerald-300' },
   { key: 'power', label: '国力', color: 'bg-amber-400', text: 'text-amber-300' },
+  { key: 'motivation', label: '意欲', color: 'bg-rose-400', text: 'text-rose-300' },
 ]
 
 const events = [
@@ -88,9 +89,88 @@ const events = [
 ]
 
 const clamp = (value) => Math.min(100, Math.max(0, value))
+const metricLabels = Object.fromEntries(metrics.map(({ key, label }) => [key, label]))
+const getChoiceEffects = (choice) => ({
+  ...choice.effects,
+  motivation:
+    choice.effects.motivation ??
+    Math.round(((choice.effects.public ?? 0) + (choice.effects.party ?? 0)) / 2),
+})
 const getNextEventIndex = (currentIndex) => {
   const nextEvents = events.map((_, index) => index).filter((index) => index !== currentIndex)
   return nextEvents[Math.floor(Math.random() * nextEvents.length)]
+}
+
+const initialTimeline = [
+  {
+    turn: '就任初日',
+    category: '外交',
+    title: '駐日各国大使と懇談',
+    detail: '各国との対話を重ね、協力関係を深める方針を確認しました。',
+  },
+  {
+    turn: '就任初日',
+    category: '政務',
+    title: '新内閣が発足',
+    detail: '新しい政権が始動しました。各大臣に政策の実行を指示しました。',
+  },
+  {
+    turn: '組閣',
+    category: '表敬訪問',
+    title: '前首相から引き継ぎ',
+    detail: '官邸で引き継ぎを受け、国内外の重要課題を確認しました。',
+  },
+  {
+    turn: '組閣',
+    category: '政務',
+    title: '閣僚との初会合',
+    detail: '国民との約束を共有し、内閣一丸となって取り組むことを確認しました。',
+  },
+  {
+    turn: '就任前',
+    category: '表敬訪問',
+    title: '国会議長を表敬訪問',
+    detail: '国会との連携を大切にし、丁寧な議論を進める考えを伝えました。',
+  },
+]
+
+function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice', idPrefix = 'office' }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 640 280"
+      className={className}
+      preserveAspectRatio={preserveAspectRatio}
+    >
+      <defs>
+        <linearGradient id={`${idPrefix}-sky`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#223751" />
+          <stop offset="1" stopColor="#111b29" />
+        </linearGradient>
+        <linearGradient id={`${idPrefix}-desk`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#624c3a" />
+          <stop offset="1" stopColor="#332b27" />
+        </linearGradient>
+      </defs>
+      <path d="M0 0h640v228H0z" fill={`url(#${idPrefix}-sky)`} />
+      <path d="M30 18h255v156H30z" fill="#101a28" stroke="#536174" strokeWidth="8" />
+      <path d="M42 30h231v132H42z" fill="#1b3045" />
+      <path d="M157 30v132M42 96h231" stroke="#536174" strokeWidth="5" />
+      <path d="M46 132h24V93h31v39h18V76h37v56h22v-30h32v30h19v-46h34v46h10v30H46z" fill="#26384a" />
+      <circle cx="224" cy="57" r="12" fill="#f2c779" opacity=".75" />
+      <path d="M307 24h275v157H307z" fill="#182334" stroke="#39495c" strokeWidth="5" />
+      <path d="M337 49h213v94H337z" fill="#233448" />
+      <path d="M353 74h181M353 95h181M353 116h134" stroke="#42566c" strokeWidth="5" opacity=".8" />
+      <path d="M0 205h640v75H0z" fill="#101722" />
+      <path d="M62 193h518l-34 48H98z" fill={`url(#${idPrefix}-desk)`} />
+      <path d="M118 241h28v39h-28zm380 0h28v39h-28z" fill="#342a25" />
+      <path d="M421 161v40" stroke="#b8c4d5" strokeWidth="3" />
+      <path d="M424 163h38v26h-38z" fill="#f7f4ed" />
+      <circle cx="443" cy="176" r="7" fill="#c94b50" />
+      <path d="M211 207h119l13 15H197z" fill="#171e28" />
+      <path d="M227 191h86v16h-86z" fill="#29384a" />
+    </svg>
+  )
 }
 
 function App() {
@@ -99,19 +179,23 @@ function App() {
     party: 50,
     happiness: 50,
     power: 50,
+    motivation: 50,
   })
   const [turn, setTurn] = useState(1)
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState(initialTimeline)
   const [eventIndex, setEventIndex] = useState(0)
   const [isDecisionOpen, setIsDecisionOpen] = useState(false)
+  const [activeModal, setActiveModal] = useState(null)
+  const [gameSpeed, setGameSpeed] = useState(1)
   const event = events[eventIndex]
   const gameMonth = turn - 1
   const gameDate = `${2025 + Math.floor(gameMonth / 12)}年${(gameMonth % 12) + 1}月`
 
   const makeDecision = (choice) => {
+    const effects = getChoiceEffects(choice)
     setStatus((current) =>
       Object.fromEntries(
-        Object.entries(choice.effects).map(([key, change]) => [
+        Object.entries(effects).map(([key, change]) => [
           key,
           clamp(current[key] + change),
         ]),
@@ -124,6 +208,7 @@ function App() {
         title: event.title,
         choice: choice.label,
         detail: choice.detail,
+        isDecision: true,
       },
       ...current,
     ])
@@ -143,11 +228,15 @@ function App() {
                 <span className="text-xs text-slate-400">在任</span>
                 <span className="ml-1.5 font-semibold tabular-nums text-white">{turn}ヶ月</span>
               </div>
-              <div className="flex items-center gap-1 rounded-lg border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-sm text-amber-200">
+              <button
+                type="button"
+                onClick={() => setActiveModal('promises')}
+                className="flex items-center gap-1 rounded-lg border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-sm text-amber-200 transition hover:bg-amber-300/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300"
+              >
                 <span className="text-amber-300">◆</span>
                 <span className="font-semibold">公約</span>
                 <span className="hidden text-amber-100/70 sm:inline">暮らしと未来を守る</span>
-              </div>
+              </button>
             </div>
             <span className="text-xs tabular-nums text-slate-400">ゲーム時間 {gameDate}</span>
           </div>
@@ -161,56 +250,32 @@ function App() {
               <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">首相官邸 · 執務室</p>
               <h2 className="mt-1 text-lg font-bold text-white sm:text-xl">国の未来を決める場所</h2>
             </div>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 640 280"
-              className="absolute inset-x-0 bottom-0 h-4/5 w-full"
-              preserveAspectRatio="xMidYMax slice"
+            <OfficeIllustration className="absolute inset-x-0 bottom-0 h-4/5 w-full" />
+            <button
+              type="button"
+              onClick={() => setActiveModal('phone')}
+              className="absolute bottom-2 left-2 z-10 rounded-lg border border-emerald-300/30 bg-emerald-950/80 px-2.5 py-1.5 text-xs font-semibold text-emerald-100 shadow-lg transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 sm:bottom-3 sm:left-3 sm:text-sm"
             >
-              <defs>
-                <linearGradient id="officeSky" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#223751" />
-                  <stop offset="1" stopColor="#111b29" />
-                </linearGradient>
-                <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#624c3a" />
-                  <stop offset="1" stopColor="#332b27" />
-                </linearGradient>
-              </defs>
-              <path d="M0 0h640v228H0z" fill="url(#officeSky)" />
-              <path d="M30 18h255v156H30z" fill="#101a28" stroke="#536174" strokeWidth="8" />
-              <path d="M42 30h231v132H42z" fill="#1b3045" />
-              <path d="M157 30v132M42 96h231" stroke="#536174" strokeWidth="5" />
-              <path d="M46 132h24V93h31v39h18V76h37v56h22v-30h32v30h19v-46h34v46h10v30H46z" fill="#26384a" />
-              <circle cx="224" cy="57" r="12" fill="#f2c779" opacity=".75" />
-              <path d="M307 24h275v157H307z" fill="#182334" stroke="#39495c" strokeWidth="5" />
-              <path d="M337 49h213v94H337z" fill="#233448" />
-              <path d="M353 74h181M353 95h181M353 116h134" stroke="#42566c" strokeWidth="5" opacity=".8" />
-              <path d="M0 205h640v75H0z" fill="#101722" />
-              <path d="M62 193h518l-34 48H98z" fill="url(#desk)" />
-              <path d="M118 241h28v39h-28zm380 0h28v39h-28z" fill="#342a25" />
-              <path d="M421 161v40" stroke="#b8c4d5" strokeWidth="3" />
-              <path d="M424 163h38v26h-38z" fill="#f7f4ed" />
-              <circle cx="443" cy="176" r="7" fill="#c94b50" />
-              <path d="M211 207h119l13 15H197z" fill="#171e28" />
-              <path d="M227 191h86v16h-86z" fill="#29384a" />
-            </svg>
+              ☎ 電話する
+            </button>
             <div className="absolute bottom-2 right-2.5 rounded-full border border-white/10 bg-[#0b111bd9] px-1.5 py-0.5 text-[10px] tracking-widest text-slate-400">
               PRIME MINISTER'S OFFICE
             </div>
           </div>
 
           <section aria-label="内閣の状況" className="rounded-2xl border border-white/10 bg-[#111827] p-2 sm:p-2.5">
-            <div className="mb-2 flex items-center justify-between">
-              <div className="flex items-center gap-1">
-                <span className="h-4 w-1 rounded-full bg-sky-400" />
-                <h2 className="text-sm font-bold tracking-wider text-slate-200">内閣の状況</h2>
-              </div>
+            <div className="mb-2 flex justify-end">
               <span className="text-xs text-slate-500">TURN {String(turn).padStart(2, '0')}</span>
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-5 gap-1.5">
               {metrics.map((metric) => (
-                <div key={metric.key} className="min-w-0">
+                <button
+                  key={metric.key}
+                  type="button"
+                  onClick={() => setActiveModal(metric.key)}
+                  aria-label={`${metric.label}の詳細を表示`}
+                  className="min-w-0 rounded-lg p-1 text-left transition hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-400"
+                >
                   <div className="mb-1 flex flex-col">
                     <span className="text-[10px] font-medium leading-4 text-slate-300 sm:text-xs">{metric.label}</span>
                     <span className={`text-base font-bold tabular-nums sm:text-lg ${metric.text}`}>
@@ -230,10 +295,29 @@ function App() {
                       style={{ width: `${status[metric.key]}%` }}
                     />
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </section>
+        </section>
+
+        <section aria-label="ゲームの進行速度" className="flex items-center justify-end gap-1.5">
+          <span className="mr-1 text-xs text-slate-400">進行速度</span>
+          {[1, 2, 3].map((speed) => (
+            <button
+              key={speed}
+              type="button"
+              aria-pressed={gameSpeed === speed}
+              onClick={() => setGameSpeed(speed)}
+              className={`min-w-10 rounded-lg border px-2 py-1 text-xs font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+                gameSpeed === speed
+                  ? 'border-sky-400/50 bg-sky-400/15 text-sky-200'
+                  : 'border-white/10 bg-white/[0.03] text-slate-400 hover:bg-white/[0.08]'
+              }`}
+            >
+              {speed}x
+            </button>
+          ))}
         </section>
 
         <section aria-label="イベントのタイムライン">
@@ -269,16 +353,22 @@ function App() {
               </article>
             </li>
             {history.map((item) => (
-              <li key={item.turn} className="relative pl-10">
+              <li key={`${item.turn}-${item.title}`} className="relative pl-10">
                 <span className="absolute left-[10px] top-5 size-3 rounded-full border-2 border-[#090d16] bg-violet-400" />
                 <article className="rounded-xl border border-white/[0.07] bg-[#0e1420] px-2 py-2 sm:px-2.5">
                   <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-xs font-semibold tabular-nums text-slate-500">TURN {String(item.turn).padStart(2, '0')}</span>
+                    <span className="text-xs font-semibold tabular-nums text-slate-500">
+                      {item.isDecision ? `TURN ${String(item.turn).padStart(2, '0')}` : item.turn}
+                    </span>
                     <span className="text-[11px] text-slate-500">{item.category}</span>
-                    <span className="ml-auto rounded-full bg-emerald-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">決定済み</span>
+                    <span className="ml-auto rounded-full bg-emerald-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+                      {item.isDecision ? '決定済み' : '実施済み'}
+                    </span>
                   </div>
                   <h3 className="mt-1 text-sm font-semibold text-slate-200">{item.title}</h3>
-                  <p className="mt-0.5 text-xs leading-5 text-slate-400">{item.choice} — {item.detail}</p>
+                  <p className="mt-0.5 text-xs leading-5 text-slate-400">
+                    {item.choice ? `${item.choice} — ` : ''}{item.detail}
+                  </p>
                 </article>
               </li>
             ))}
@@ -290,9 +380,95 @@ function App() {
         </p>
       </main>
 
+      {activeModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-2 backdrop-blur-sm sm:items-center"
+          onClick={() => setActiveModal(null)}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="details-title"
+            onClick={(clickEvent) => clickEvent.stopPropagation()}
+            className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111827] p-4 shadow-2xl shadow-black/50"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.18em] text-sky-300">
+                  {activeModal === 'promises'
+                    ? 'あなたが選んだ公約'
+                    : activeModal === 'phone'
+                      ? '官邸から連絡'
+                      : '内閣指標の内訳'}
+                </p>
+                <h2 id="details-title" className="mt-1 text-xl font-bold text-white">
+                  {activeModal === 'promises'
+                    ? '公約一覧'
+                    : activeModal === 'phone'
+                      ? '電話する'
+                      : `${metrics.find((metric) => metric.key === activeModal)?.label}の状況`}
+                </h2>
+              </div>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setActiveModal(null)}
+                aria-label="閉じる"
+                className="flex size-9 shrink-0 items-center justify-center rounded-full border border-white/10 text-lg text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-400"
+              >
+                ×
+              </button>
+            </div>
+            {activeModal === 'promises' ? (
+              <ul className="mt-4 space-y-2">
+                {[
+                  '暮らしと未来を守る',
+                  '誰もが安心できる社会保障をつくる',
+                  '地域の声を政策に反映する',
+                ].map((promise) => (
+                  <li key={promise} className="rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-3 text-sm font-medium text-amber-100">
+                    <span className="mr-2 text-amber-300">◆</span>{promise}
+                  </li>
+                ))}
+              </ul>
+            ) : activeModal === 'phone' ? (
+              <div className="mt-4 grid gap-2">
+                {['官房長官に連絡する', '各省庁に指示を出す', '国民にメッセージを伝える'].map((action) => (
+                  <button
+                    key={action}
+                    type="button"
+                    onClick={() => setActiveModal(null)}
+                    className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left text-sm font-semibold text-slate-100 transition hover:border-emerald-300/30 hover:bg-emerald-300/[0.06] focus-visible:outline-2 focus-visible:outline-emerald-300"
+                  >
+                    {action} <span className="float-right text-slate-500">→</span>
+                  </button>
+                ))}
+                <p className="text-xs text-slate-500">各アクションは今後のアップデートで利用可能になります。</p>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm text-slate-300">
+                    {metrics.find((metric) => metric.key === activeModal)?.label}
+                  </span>
+                  <span className={`text-2xl font-bold tabular-nums ${metrics.find((metric) => metric.key === activeModal)?.text}`}>
+                    {status[activeModal]}
+                  </span>
+                </div>
+                <div className="mt-3 space-y-2 border-t border-white/10 pt-3 text-sm">
+                  <p className="flex justify-between text-slate-400"><span>前月比</span><span className="text-emerald-300">+2</span></p>
+                  <p className="flex justify-between text-slate-400"><span>今月の動向</span><span className="text-slate-200">安定</span></p>
+                  <p className="text-xs leading-5 text-slate-500">詳細な内訳は今後の政策判断によって変化します。</p>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
       {isDecisionOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-2.5"
+          className="fixed inset-0 z-50 flex justify-center bg-black/80 backdrop-blur-sm"
           onClick={() => setIsDecisionOpen(false)}
         >
           <section
@@ -303,7 +479,7 @@ function App() {
             onKeyDown={(keyEvent) => {
               if (keyEvent.key === 'Escape') setIsDecisionOpen(false)
             }}
-            className="max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border border-white/10 bg-[#111827] p-2.5 shadow-2xl shadow-black/50 sm:max-w-2xl sm:rounded-2xl sm:p-3.5"
+            className="h-[100dvh] w-full overflow-y-auto border border-white/10 bg-[#111827] p-3 shadow-2xl shadow-black/50 sm:p-5"
           >
             <div className="flex items-start justify-between gap-2">
               <div>
@@ -320,26 +496,38 @@ function App() {
                 ×
               </button>
             </div>
-            <p className="mt-2 text-sm leading-7 text-slate-300">{event.description}</p>
-            <div className="mt-3">
-              <p className="mb-1.5 text-xs font-semibold tracking-wider text-slate-400">あなたの決断</p>
-              <div className="grid gap-1.5">
+            <div className="relative mt-3 aspect-[640/280] w-full overflow-hidden rounded-xl border border-white/10">
+              <OfficeIllustration className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" idPrefix="decision-office" />
+            </div>
+            <p className="mt-3 text-sm leading-7 text-slate-300">{event.description}</p>
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-semibold tracking-wider text-slate-400">あなたの決断</p>
+              <div className="grid gap-3">
                 {event.choices.map((choice, index) => (
-                  <button
-                    key={choice.label}
-                    type="button"
-                    onClick={() => makeDecision(choice)}
-                    className="group flex w-full items-start gap-2 rounded-xl border border-white/10 bg-white/[0.025] p-2 text-left transition hover:border-sky-400/50 hover:bg-sky-400/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:p-2.5"
-                  >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-slate-800 text-sm font-bold text-slate-300 transition group-hover:border-sky-400/30 group-hover:text-sky-300">
-                      {String.fromCharCode(65 + index)}
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold text-slate-100 sm:text-base">{choice.label}</span>
-                      <span className="mt-0.5 block text-xs leading-5 text-slate-400 sm:text-sm">{choice.detail}</span>
-                    </span>
-                    <span aria-hidden="true" className="ml-auto pt-1 text-slate-600 transition group-hover:translate-x-1 group-hover:text-sky-300">→</span>
-                  </button>
+                  <div key={choice.label} className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.025]">
+                    <button
+                      type="button"
+                      onClick={() => makeDecision(choice)}
+                      className="group flex w-full items-start gap-2 p-3 text-left transition hover:bg-sky-400/[0.06] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-sky-400"
+                    >
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-slate-800 text-sm font-bold text-slate-300 transition group-hover:border-sky-400/30 group-hover:text-sky-300">
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <span>
+                        <span className="block text-sm font-semibold text-slate-100 sm:text-base">{choice.label}</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-slate-400 sm:text-sm">{choice.detail}</span>
+                      </span>
+                      <span aria-hidden="true" className="ml-auto pt-1 text-slate-600 transition group-hover:translate-x-1 group-hover:text-sky-300">→</span>
+                    </button>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-white/[0.07] px-3 py-2">
+                      <span className="w-full text-[11px] font-semibold text-slate-500">選択による効果（ダミー）</span>
+                      {Object.entries(getChoiceEffects(choice)).map(([key, change]) => (
+                        <span key={key} className={`text-xs ${change >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                          {metricLabels[key]} {change > 0 ? '+' : ''}{change}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
