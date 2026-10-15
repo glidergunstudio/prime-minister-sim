@@ -105,6 +105,8 @@ function App() {
   const [eventIndex, setEventIndex] = useState(0)
   const [isDecisionOpen, setIsDecisionOpen] = useState(false)
   const event = events[eventIndex]
+  const gameMonth = turn - 1
+  const gameDate = `${2025 + Math.floor(gameMonth / 12)}年${(gameMonth % 12) + 1}月`
 
   const makeDecision = (choice) => {
     setStatus((current) =>
@@ -133,17 +135,21 @@ function App() {
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100">
       <header className="border-b border-white/10 bg-[#0d1320]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2.5 px-2.5 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1">
-              <span className="text-xs text-slate-400">在任</span>
-              <span className="ml-1.5 font-semibold tabular-nums text-white">{turn}ヶ月</span>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2.5 px-2.5 py-2.5 sm:px-4">
+          <h1 className="text-sm font-bold text-white sm:text-base">未来創造内閣</h1>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <div className="flex flex-wrap items-center justify-end gap-1.5">
+              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1">
+                <span className="text-xs text-slate-400">在任</span>
+                <span className="ml-1.5 font-semibold tabular-nums text-white">{turn}ヶ月</span>
+              </div>
+              <div className="flex items-center gap-1 rounded-lg border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-sm text-amber-200">
+                <span className="text-amber-300">◆</span>
+                <span className="font-semibold">公約</span>
+                <span className="hidden text-amber-100/70 sm:inline">暮らしと未来を守る</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1 rounded-lg border border-amber-300/20 bg-amber-300/10 px-2 py-1 text-sm text-amber-200">
-              <span className="text-amber-300">◆</span>
-              <span className="font-semibold">公約</span>
-              <span className="hidden text-amber-100/70 sm:inline">暮らしと未来を守る</span>
-            </div>
+            <span className="text-xs tabular-nums text-slate-400">ゲーム時間 {gameDate}</span>
           </div>
         </div>
       </header>
@@ -202,12 +208,12 @@ function App() {
               </div>
               <span className="text-xs text-slate-500">TURN {String(turn).padStart(2, '0')}</span>
             </div>
-            <div className="grid grid-cols-1 gap-y-2.5">
+            <div className="grid grid-cols-4 gap-1.5">
               {metrics.map((metric) => (
-                <div key={metric.key}>
-                  <div className="mb-1 flex items-center justify-between gap-1">
-                    <span className="text-xs font-medium text-slate-300 sm:text-sm">{metric.label}</span>
-                    <span className={`text-lg font-bold tabular-nums ${metric.text}`}>
+                <div key={metric.key} className="min-w-0">
+                  <div className="mb-1 flex flex-col">
+                    <span className="text-[10px] font-medium leading-4 text-slate-300 sm:text-xs">{metric.label}</span>
+                    <span className={`text-base font-bold tabular-nums sm:text-lg ${metric.text}`}>
                       {status[metric.key]}
                     </span>
                   </div>
