@@ -10,6 +10,22 @@ const profileFields = [
   { key: 'past', label: '消せない過去', options: ['若手時代の失言', '過去の公約未達', '政治資金の説明不足', '強引な党内運営', '古い発言の再燃'] },
 ]
 
+const ideologies = [
+  'とにかくクリーンな世の中を実現',
+  '経済成長を最優先する',
+  '誰もが安心できる社会をつくる',
+  '地域の力を引き出す',
+]
+
+const promiseOptions = [
+  '財政規律の確保',
+  '出生率の上昇',
+  '防衛力強化',
+  '賃金と雇用の改善',
+  '地方経済の活性化',
+  '子育て支援の拡充',
+]
+
 const metrics = [
   { key: 'public', label: '世論', color: 'bg-sky-400', text: 'text-sky-300' },
   { key: 'party', label: '党内支持', color: 'bg-violet-400', text: 'text-violet-300' },
@@ -186,6 +202,8 @@ function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice',
 function App() {
   const [screen, setScreen] = useState('intro')
   const [profile, setProfile] = useState({})
+  const [ideology, setIdeology] = useState(ideologies[0])
+  const [promises, setPromises] = useState(promiseOptions.slice(0, 3))
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
   const [rollingValue, setRollingValue] = useState('')
   const [isSpinning, setIsSpinning] = useState(false)
@@ -290,10 +308,10 @@ function App() {
           {allProfileFieldsSelected ? (
             <button
               type="button"
-              onClick={() => setScreen('cabinet')}
+              onClick={() => setScreen('values')}
               className="mt-6 w-full rounded-lg bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             >
-              組閣
+              理念・公約を選ぶ
             </button>
           ) : (
             <button
@@ -305,6 +323,75 @@ function App() {
               {isSpinning ? '抽選中…' : `${profileFields[currentProfileIndex].label}のルーレットを回す`}
             </button>
           )}
+        </section>
+      </main>
+    )
+  }
+
+  if (screen === 'values') {
+    const updatePromise = (index, value) => {
+      setPromises((current) => current.map((promise, promiseIndex) => (
+        promiseIndex === index ? value : promise
+      )))
+    }
+
+    return (
+      <main className="min-h-screen bg-black px-4 py-10 text-slate-100 sm:px-6">
+        <section className="mx-auto max-w-2xl">
+          <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">政権の方針</p>
+          <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">理念と公約を選択</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            理念はイベントや総理への影響に、公約の達成状況は支持率などに影響します。
+          </p>
+
+          <div className="mt-8">
+            <label htmlFor="ideology" className="mb-3 block text-lg font-semibold text-white">
+              理念
+            </label>
+            <select
+              id="ideology"
+              value={ideology}
+              onChange={(changeEvent) => setIdeology(changeEvent.target.value)}
+              className="w-full rounded-xl border border-white/15 bg-[#111827] px-4 py-4 text-base text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              {ideologies.map((option) => <option key={option}>{option}</option>)}
+            </select>
+          </div>
+
+          <fieldset className="mt-6">
+            <legend className="mb-3 text-lg font-semibold text-white">公約</legend>
+            <div className="space-y-3">
+              {promises.map((promise, index) => (
+                <div key={promise}>
+                  <select
+                    id={`promise-${index}`}
+                    aria-label={`公約 ${index + 1}`}
+                    value={promise}
+                    onChange={(changeEvent) => updatePromise(index, changeEvent.target.value)}
+                    className="w-full rounded-xl border border-white/15 bg-[#111827] px-4 py-4 text-base text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                  >
+                    {promiseOptions.map((option) => (
+                      <option
+                        key={option}
+                        value={option}
+                        disabled={promises.includes(option) && option !== promise}
+                      >
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+
+          <button
+            type="button"
+            onClick={() => setScreen('cabinet')}
+            className="mt-8 w-full rounded-xl bg-sky-400 px-5 py-4 text-lg font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+          >
+            組閣する
+          </button>
         </section>
       </main>
     )
@@ -325,6 +412,14 @@ function App() {
               </div>
             ))}
           </dl>
+          <div className="mt-6 rounded-xl border border-sky-300/15 bg-sky-300/[0.04] p-4">
+            <h2 className="text-sm font-semibold text-sky-200">政権の理念</h2>
+            <p className="mt-1 text-white">{ideology}</p>
+            <h2 className="mt-4 text-sm font-semibold text-amber-200">掲げる公約</h2>
+            <ul className="mt-2 space-y-1 text-sm text-slate-200">
+              {promises.map((promise) => <li key={promise}>・{promise}</li>)}
+            </ul>
+          </div>
           <button
             type="button"
             onClick={() => setScreen('office')}
@@ -567,11 +662,7 @@ function App() {
             </div>
             {activeModal === 'promises' ? (
               <ul className="mt-4 space-y-2">
-                {[
-                  '暮らしと未来を守る',
-                  '誰もが安心できる社会保障をつくる',
-                  '地域の声を政策に反映する',
-                ].map((promise) => (
+                {promises.map((promise) => (
                   <li key={promise} className="rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-3 text-sm font-medium text-amber-100">
                     <span className="mr-2 text-amber-300">◆</span>{promise}
                   </li>
