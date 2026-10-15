@@ -28,6 +28,14 @@ const promiseOptions = [
 
 const cabinetPosts = ['内閣官房長官', '財務大臣', '外務大臣', '厚生労働大臣', '防衛大臣']
 
+const cabinetPostDescriptions = {
+  内閣官房長官: '内閣の政策を調整し、政府の方針を国民に説明する役職です。',
+  財務大臣: '国の予算や税制を管理し、財政運営を担う役職です。',
+  外務大臣: '各国との外交交渉や条約、国際協力を担う役職です。',
+  厚生労働大臣: '医療、年金、福祉、雇用など、暮らしを支える政策を担う役職です。',
+  防衛大臣: '自衛隊を指揮監督し、日本の防衛や安全保障を担う役職です。',
+}
+
 const cabinetCandidates = [
   { id: 'aoi', name: '青井 さくら', district: '東京5区', experience: '当選6回', influence: 60, administration: 80, debate: 20, note: '身体検査：怪しい噂がある' },
   { id: 'kanda', name: '神田 健一', district: '大阪3区', experience: '当選4回', influence: 72, administration: 68, debate: 74, note: '調整力に優れる' },
@@ -355,6 +363,7 @@ function App() {
   const [rollingValue, setRollingValue] = useState('')
   const [isSpinning, setIsSpinning] = useState(false)
   const [cabinetPostIndex, setCabinetPostIndex] = useState(0)
+  const [isCabinetHelpOpen, setIsCabinetHelpOpen] = useState(false)
   const [cabinetCandidateId, setCabinetCandidateId] = useState(null)
   const [cabinetAssignments, setCabinetAssignments] = useState({})
   const [status, setStatus] = useState({
@@ -396,6 +405,17 @@ function App() {
       window.clearTimeout(timeoutId)
     }
   }, [isSpinning, currentProfileIndex])
+
+  useEffect(() => {
+    if (!isCabinetHelpOpen) return
+
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setIsCabinetHelpOpen(false)
+    }
+
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [isCabinetHelpOpen])
 
   if (screen === 'intro') {
     return (
@@ -601,54 +621,65 @@ function App() {
     }
 
     return (
-      <main className="min-h-screen bg-[#090d16] px-4 py-8 text-slate-100 sm:px-6">
+      <main className="min-h-screen bg-[#090d16] px-4 py-4 text-slate-100 sm:px-6 sm:py-5">
         <section className="mx-auto max-w-3xl">
           <header className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">新内閣の人事</p>
-              <h1 className="mt-2 text-3xl font-bold text-white">組閣</h1>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                大臣ポストと人材を選んで任命します。人材を選ばず任命すると、候補者からランダムに選ばれます。
+              <h1 className="text-3xl font-bold text-white">組閣</h1>
+              <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-300">
+                大臣ポストと人材を選んで任命します。<br />
+                人材未選択なら候補者からランダムに任命します。
               </p>
             </div>
             <button
               type="button"
               onClick={completeCabinet}
-              className="shrink-0 rounded-xl bg-sky-400 px-4 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              className="shrink-0 rounded-xl bg-sky-400 px-4 py-2.5 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             >
               組閣する
             </button>
           </header>
 
-          <section aria-label="大臣ポスト" className="mt-6 rounded-2xl border border-white/10 bg-[#111827] p-5 sm:p-7">
+          <section aria-label="大臣ポスト" className="mt-3 rounded-2xl border border-white/10 bg-[#111827] p-2.5 sm:p-4">
             <div className="flex items-center justify-between gap-3">
               <button
                 type="button"
                 aria-label="前の大臣ポスト"
                 onClick={() => setCabinetPostIndex((index) => (index - 1 + cabinetPosts.length) % cabinetPosts.length)}
-                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10"
+                className="rounded-full border border-white/15 px-3 py-1.5 text-xl text-slate-200 hover:bg-white/10"
               >
                 ←
               </button>
               <div className="text-center">
                 <p className="text-sm text-slate-400">大臣ポスト {cabinetPostIndex + 1} / {cabinetPosts.length}</p>
-                <h2 className="mt-1 text-2xl font-bold text-white">{currentPost}</h2>
+                <div className="mt-1 flex items-center justify-center gap-2">
+                  <h2 className="text-2xl font-bold text-white">{currentPost}</h2>
+                  <button
+                    type="button"
+                    aria-label={`${currentPost}の説明を表示`}
+                    aria-haspopup="dialog"
+                    onClick={() => setIsCabinetHelpOpen(true)}
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-sky-200/40 text-sm font-bold text-sky-200 transition hover:bg-sky-200/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  >
+                    ?
+                  </button>
+                </div>
               </div>
               <button
                 type="button"
                 aria-label="次の大臣ポスト"
                 onClick={() => setCabinetPostIndex((index) => (index + 1) % cabinetPosts.length)}
-                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10"
+                className="rounded-full border border-white/15 px-3 py-1.5 text-xl text-slate-200 hover:bg-white/10"
               >
                 →
               </button>
             </div>
 
-            <div className="mt-5 flex min-h-44 flex-col items-center justify-center rounded-xl border border-dashed border-sky-300/25 bg-sky-300/[0.03] p-4 text-center">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full border border-sky-200/30 bg-slate-800 text-3xl font-bold text-sky-200">
+            <div className="mt-3 flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-sky-300/25 bg-sky-300/[0.03] p-2.5 text-center">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-sky-200/30 bg-slate-800 text-3xl font-bold text-sky-200">
                 {assignedCandidate?.name.slice(0, 1) ?? '?'}
               </div>
-              <p className="mt-3 text-lg font-semibold text-white">
+              <p className="mt-2 text-lg font-semibold text-white">
                 {assignedCandidate?.name ?? '未任命'}
               </p>
               {assignedCandidate && (
@@ -663,14 +694,14 @@ function App() {
                   delete next[currentPost]
                   return next
                 })}
-                className="mt-3 w-full rounded-lg border border-rose-300/25 px-4 py-2 text-sm font-semibold text-rose-200 transition hover:bg-rose-300/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300"
+                className="mt-2 w-full rounded-lg border border-rose-300/25 px-3 py-1.5 text-sm font-semibold text-rose-200 transition hover:bg-rose-300/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300"
               >
                 このポストの任命を解除
               </button>
             )}
           </section>
 
-          <section aria-label="人材プール" className="mt-5 rounded-2xl border border-white/10 bg-[#111827] p-5 sm:p-7">
+          <section aria-label="人材プール" className="mt-2.5 rounded-2xl border border-white/10 bg-[#111827] p-2.5 sm:p-4">
             <div className="flex items-center justify-between gap-3">
               <button
                 type="button"
@@ -680,7 +711,7 @@ function App() {
                   const index = (currentCandidateIndex - 1 + availableCandidates.length) % availableCandidates.length
                   setCabinetCandidateId(availableCandidates[index].id)
                 }}
-                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10 disabled:opacity-40"
+                className="rounded-full border border-white/15 px-3 py-1.5 text-xl text-slate-200 hover:bg-white/10 disabled:opacity-40"
               >
                 ←
               </button>
@@ -698,7 +729,7 @@ function App() {
                   const index = (currentCandidateIndex + 1) % availableCandidates.length
                   setCabinetCandidateId(availableCandidates[index].id)
                 }}
-                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10 disabled:opacity-40"
+                className="rounded-full border border-white/15 px-3 py-1.5 text-xl text-slate-200 hover:bg-white/10 disabled:opacity-40"
               >
                 →
               </button>
@@ -712,7 +743,7 @@ function App() {
                   onClick={() => setCabinetCandidateId((id) => (
                     id === currentCandidate.id ? null : currentCandidate.id
                   ))}
-                  className={`mt-4 w-full rounded-xl border p-4 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+                  className={`mt-2 w-full rounded-xl border p-2.5 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
                     cabinetCandidateId === currentCandidate.id
                       ? 'border-sky-300/60 bg-sky-300/10'
                       : 'border-white/10 bg-white/[0.025] hover:bg-white/[0.06]'
@@ -730,17 +761,17 @@ function App() {
                       {cabinetCandidateId === currentCandidate.id ? '選択中' : '選択する'}
                     </span>
                   </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
+                  <div className="mt-2 grid grid-cols-3 gap-2 text-center text-sm">
                     <p><span className="block text-slate-400">影響力</span>{currentCandidate.influence}</p>
                     <p><span className="block text-slate-400">実務力</span>{currentCandidate.administration}</p>
                     <p><span className="block text-slate-400">答弁力</span>{currentCandidate.debate}</p>
                   </div>
-                  <p className="mt-3 border-t border-white/10 pt-3 text-sm text-slate-300">{currentCandidate.note}</p>
+                  <p className="mt-2 border-t border-white/10 pt-2 text-sm text-slate-300">{currentCandidate.note}</p>
                 </button>
                 <button
                   type="button"
                   onClick={appointCandidate}
-                  className="mt-4 w-full rounded-xl bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                  className="mt-2 w-full rounded-xl bg-sky-400 px-4 py-2 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                 >
                   {cabinetCandidateId ? '任命する' : '任命する（ランダム）'}
                 </button>
@@ -752,6 +783,30 @@ function App() {
             )}
           </section>
         </section>
+        {isCabinetHelpOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setIsCabinetHelpOpen(false)}
+          >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cabinet-help-title"
+              className="w-full max-w-md rounded-2xl border border-white/10 bg-[#111827] p-5 text-slate-100 shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h2 id="cabinet-help-title" className="text-lg font-bold text-white">{currentPost}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-300">{cabinetPostDescriptions[currentPost]}</p>
+              <button
+                type="button"
+                onClick={() => setIsCabinetHelpOpen(false)}
+                className="mt-4 w-full rounded-lg bg-sky-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              >
+                閉じる
+              </button>
+            </section>
+          </div>
+        )}
       </main>
     )
   }
