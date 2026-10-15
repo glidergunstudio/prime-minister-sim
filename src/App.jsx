@@ -26,6 +26,18 @@ const promiseOptions = [
   '子育て支援の拡充',
 ]
 
+const cabinetPosts = ['内閣官房長官', '財務大臣', '外務大臣', '厚生労働大臣', '防衛大臣']
+
+const cabinetCandidates = [
+  { id: 'aoi', name: '青井 さくら', district: '東京5区', experience: '当選6回', influence: 60, administration: 80, debate: 20, note: '身体検査：怪しい噂がある' },
+  { id: 'kanda', name: '神田 健一', district: '大阪3区', experience: '当選4回', influence: 72, administration: 68, debate: 74, note: '調整力に優れる' },
+  { id: 'mori', name: '森 由美子', district: '北海道2区', experience: '当選3回', influence: 55, administration: 86, debate: 63, note: '実務経験が豊富' },
+  { id: 'sato', name: '佐藤 大輔', district: '福岡1区', experience: '当選5回', influence: 81, administration: 59, debate: 70, note: '党内の人脈が広い' },
+  { id: 'ishida', name: '石田 美咲', district: '京都2区', experience: '当選2回', influence: 68, administration: 73, debate: 88, note: '発信力に定評がある' },
+  { id: 'noda', name: '野田 誠', district: '愛知7区', experience: '当選3回', influence: 74, administration: 77, debate: 58, note: '民間企業での経験がある' },
+  { id: 'suzuki', name: '鈴木 玲奈', district: '神奈川4区', experience: '当選2回', influence: 62, administration: 82, debate: 76, note: '政策立案に詳しい' },
+]
+
 const metrics = [
   { key: 'public', label: '世論', color: 'bg-sky-400', text: 'text-sky-300' },
   { key: 'party', label: '党内支持', color: 'bg-violet-400', text: 'text-violet-300' },
@@ -207,6 +219,9 @@ function App() {
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0)
   const [rollingValue, setRollingValue] = useState('')
   const [isSpinning, setIsSpinning] = useState(false)
+  const [cabinetPostIndex, setCabinetPostIndex] = useState(0)
+  const [cabinetCandidateId, setCabinetCandidateId] = useState(null)
+  const [cabinetAssignments, setCabinetAssignments] = useState({})
   const [status, setStatus] = useState({
     public: 50,
     party: 50,
@@ -398,35 +413,204 @@ function App() {
   }
 
   if (screen === 'cabinet') {
+    const currentPost = cabinetPosts[cabinetPostIndex]
+    const availableCandidates = cabinetCandidates.filter((candidate) => (
+      !Object.entries(cabinetAssignments).some(([post, assignedCandidateId]) => (
+        post !== currentPost && assignedCandidateId === candidate.id
+      ))
+    ))
+    const selectedCandidate = availableCandidates.find(
+      (candidate) => candidate.id === cabinetCandidateId,
+    )
+    const currentCandidateIndex = Math.max(
+      0,
+      availableCandidates.findIndex((candidate) => candidate.id === selectedCandidate?.id),
+    )
+    const currentCandidate = availableCandidates[currentCandidateIndex]
+    const assignedCandidate = cabinetCandidates.find(
+      (candidate) => candidate.id === cabinetAssignments[currentPost],
+    )
+
+    const appointCandidate = () => {
+      const candidate = selectedCandidate
+        ?? availableCandidates[Math.floor(Math.random() * availableCandidates.length)]
+      if (!candidate) return
+
+      setCabinetAssignments((current) => ({ ...current, [currentPost]: candidate.id }))
+      setCabinetCandidateId(null)
+      setCabinetPostIndex((index) => (index + 1) % cabinetPosts.length)
+    }
+
+    const completeCabinet = () => {
+      setCabinetAssignments((current) => {
+        const remainingCandidates = cabinetCandidates.filter(
+          (candidate) => !Object.values(current).includes(candidate.id),
+        )
+        const completed = { ...current }
+
+        cabinetPosts.forEach((post) => {
+          if (completed[post]) return
+          const candidateIndex = Math.floor(Math.random() * remainingCandidates.length)
+          const [candidate] = remainingCandidates.splice(candidateIndex, 1)
+          if (candidate) completed[post] = candidate.id
+        })
+
+        return completed
+      })
+      setScreen('office')
+    }
+
     return (
       <main className="min-h-screen bg-[#090d16] px-4 py-8 text-slate-100 sm:px-6">
-        <section className="mx-auto max-w-2xl rounded-2xl border border-white/10 bg-[#111827] p-6 sm:p-8">
-          <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">内閣総理大臣</p>
-          <h1 className="mt-2 text-3xl font-bold text-white">組閣</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-300">総理のプロフィールが決まりました。これから内閣を発足します。</p>
-          <dl className="mt-6 grid gap-3 sm:grid-cols-2">
-            {profileFields.map((field) => (
-              <div key={field.key} className="rounded-lg border border-white/10 bg-white/[0.025] p-3">
-                <dt className="text-xs text-slate-400">{field.label}</dt>
-                <dd className="mt-1 font-semibold text-white">{profile[field.key]}</dd>
+        <section className="mx-auto max-w-3xl">
+          <header className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">新内閣の人事</p>
+              <h1 className="mt-2 text-3xl font-bold text-white">組閣</h1>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                大臣ポストと人材を選んで任命します。人材を選ばず任命すると、候補者からランダムに選ばれます。
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={completeCabinet}
+              className="shrink-0 rounded-xl bg-sky-400 px-4 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              組閣する
+            </button>
+          </header>
+
+          <section aria-label="大臣ポスト" className="mt-6 rounded-2xl border border-white/10 bg-[#111827] p-5 sm:p-7">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                aria-label="前の大臣ポスト"
+                onClick={() => setCabinetPostIndex((index) => (index - 1 + cabinetPosts.length) % cabinetPosts.length)}
+                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10"
+              >
+                ←
+              </button>
+              <div className="text-center">
+                <p className="text-sm text-slate-400">大臣ポスト {cabinetPostIndex + 1} / {cabinetPosts.length}</p>
+                <h2 className="mt-1 text-2xl font-bold text-white">{currentPost}</h2>
               </div>
-            ))}
-          </dl>
-          <div className="mt-6 rounded-xl border border-sky-300/15 bg-sky-300/[0.04] p-4">
-            <h2 className="text-sm font-semibold text-sky-200">政権の理念</h2>
-            <p className="mt-1 text-white">{ideology}</p>
-            <h2 className="mt-4 text-sm font-semibold text-amber-200">掲げる公約</h2>
-            <ul className="mt-2 space-y-1 text-sm text-slate-200">
-              {promises.map((promise) => <li key={promise}>・{promise}</li>)}
-            </ul>
-          </div>
-          <button
-            type="button"
-            onClick={() => setScreen('office')}
-            className="mt-6 w-full rounded-lg bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-          >
-            執務室へ
-          </button>
+              <button
+                type="button"
+                aria-label="次の大臣ポスト"
+                onClick={() => setCabinetPostIndex((index) => (index + 1) % cabinetPosts.length)}
+                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10"
+              >
+                →
+              </button>
+            </div>
+
+            <div className="mt-5 flex min-h-44 flex-col items-center justify-center rounded-xl border border-dashed border-sky-300/25 bg-sky-300/[0.03] p-4 text-center">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border border-sky-200/30 bg-slate-800 text-3xl font-bold text-sky-200">
+                {assignedCandidate?.name.slice(0, 1) ?? '?'}
+              </div>
+              <p className="mt-3 text-lg font-semibold text-white">
+                {assignedCandidate?.name ?? '未任命'}
+              </p>
+              {assignedCandidate && (
+                <p className="mt-1 text-sm text-slate-400">{assignedCandidate.district}・{assignedCandidate.experience}</p>
+              )}
+            </div>
+            {assignedCandidate && (
+              <button
+                type="button"
+                onClick={() => setCabinetAssignments((current) => {
+                  const next = { ...current }
+                  delete next[currentPost]
+                  return next
+                })}
+                className="mt-3 w-full rounded-lg border border-rose-300/25 px-4 py-2 text-sm font-semibold text-rose-200 transition hover:bg-rose-300/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300"
+              >
+                このポストの任命を解除
+              </button>
+            )}
+          </section>
+
+          <section aria-label="人材プール" className="mt-5 rounded-2xl border border-white/10 bg-[#111827] p-5 sm:p-7">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                aria-label="前の候補者"
+                disabled={availableCandidates.length < 2}
+                onClick={() => {
+                  const index = (currentCandidateIndex - 1 + availableCandidates.length) % availableCandidates.length
+                  setCabinetCandidateId(availableCandidates[index].id)
+                }}
+                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10 disabled:opacity-40"
+              >
+                ←
+              </button>
+              <div className="text-center">
+                <h2 className="text-lg font-semibold text-sky-200">人材プール</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  {currentCandidate ? `候補者 ${cabinetCandidates.indexOf(currentCandidate) + 1} / ${cabinetCandidates.length}` : '候補者なし'}
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="次の候補者"
+                disabled={availableCandidates.length < 2}
+                onClick={() => {
+                  const index = (currentCandidateIndex + 1) % availableCandidates.length
+                  setCabinetCandidateId(availableCandidates[index].id)
+                }}
+                className="rounded-full border border-white/15 px-4 py-2 text-xl text-slate-200 hover:bg-white/10 disabled:opacity-40"
+              >
+                →
+              </button>
+            </div>
+
+            {currentCandidate ? (
+              <>
+                <button
+                  type="button"
+                  aria-pressed={cabinetCandidateId === currentCandidate.id}
+                  onClick={() => setCabinetCandidateId((id) => (
+                    id === currentCandidate.id ? null : currentCandidate.id
+                  ))}
+                  className={`mt-4 w-full rounded-xl border p-4 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
+                    cabinetCandidateId === currentCandidate.id
+                      ? 'border-sky-300/60 bg-sky-300/10'
+                      : 'border-white/10 bg-white/[0.025] hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-800 text-2xl font-bold text-sky-200">
+                      {currentCandidate.name.slice(0, 1)}
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-white">{currentCandidate.name}</p>
+                      <p className="mt-1 text-sm text-slate-300">{currentCandidate.district}・{currentCandidate.experience}</p>
+                    </div>
+                    <span className="ml-auto text-sm font-semibold text-sky-200">
+                      {cabinetCandidateId === currentCandidate.id ? '選択中' : '選択する'}
+                    </span>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center text-sm">
+                    <p><span className="block text-slate-400">影響力</span>{currentCandidate.influence}</p>
+                    <p><span className="block text-slate-400">実務力</span>{currentCandidate.administration}</p>
+                    <p><span className="block text-slate-400">答弁力</span>{currentCandidate.debate}</p>
+                  </div>
+                  <p className="mt-3 border-t border-white/10 pt-3 text-sm text-slate-300">{currentCandidate.note}</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={appointCandidate}
+                  className="mt-4 w-full rounded-xl bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                >
+                  {cabinetCandidateId ? '任命する' : '任命する（ランダム）'}
+                </button>
+              </>
+            ) : (
+              <p className="mt-4 rounded-xl border border-white/10 p-4 text-center text-slate-300">
+                任命できる候補者がいません。任命を解除するか、組閣を完了してください。
+              </p>
+            )}
+          </section>
         </section>
       </main>
     )
