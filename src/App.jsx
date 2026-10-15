@@ -34,6 +34,47 @@ const metrics = [
   { key: 'motivation', label: '意欲', color: 'bg-rose-400', text: 'text-rose-300' },
 ]
 
+const opinionDemographics = [
+  { label: '全', male: 60, female: 40 },
+  { label: 'シニア', male: 70, female: 80 },
+  { label: 'ミドル', male: 60, female: 50 },
+  { label: '若年', male: 40, female: 30 },
+]
+
+const opinionGroups = [
+  {
+    title: '都市・地方',
+    groups: [{ label: '都市', value: 69 }, { label: '地方', value: 62 }],
+  },
+  {
+    title: '左派・右派',
+    groups: [{ label: '左派', value: 23 }, { label: '右派', value: 91 }],
+  },
+]
+
+const opinionAttributes = [
+  { label: '大企業', value: 70 },
+  { label: '中小企業', value: 60 },
+  { label: '労組', value: 50 },
+  { label: '学者', value: 40 },
+  { label: '子育て', value: 45 },
+  { label: '単身', value: 67 },
+]
+
+const opinionIndustries = [
+  { label: '建設', value: 56 },
+  { label: '医療', value: 35 },
+  { label: '教育', value: 52 },
+  { label: '農業', value: 86 },
+  { label: 'IT', value: 50 },
+  { label: '製造', value: 43 },
+  { label: '小売', value: 55 },
+  { label: '金融', value: 60 },
+  { label: '飲食', value: 68 },
+  { label: '不動産', value: 45 },
+  { label: 'サービス', value: 61 },
+]
+
 const events = [
   {
     category: '財政・社会保障',
@@ -196,6 +237,100 @@ function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice',
       <path d="M211 207h119l13 15H197z" fill="#171e28" />
       <path d="M227 191h86v16h-86z" fill="#29384a" />
     </svg>
+  )
+}
+
+function OpinionDetails({ support }) {
+  const adjustment = support - 50
+  const adjustedSupport = (value) => clamp(value + adjustment)
+
+  const SupportBar = ({ label, value, color = 'bg-emerald-400' }) => {
+    const adjustedValue = adjustedSupport(value)
+
+    return (
+      <div>
+        <div className="flex items-center justify-between gap-2 text-sm">
+          <span className="text-slate-300">{label}</span>
+          <span className="font-semibold tabular-nums text-white">{adjustedValue}%</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label={`${label}の支持率`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={adjustedValue}
+          className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-800"
+        >
+          <div className={`h-full rounded-full ${color}`} style={{ width: `${adjustedValue}%` }} />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-4 space-y-4">
+      <section aria-label="総合支持率" className="rounded-xl border border-sky-300/20 bg-sky-300/[0.06] p-3 sm:p-4">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h3 className="text-sm font-semibold text-slate-200">総合支持率</h3>
+          <span className="text-4xl font-bold tabular-nums text-sky-300">{support}</span>
+          <span className="text-sm text-slate-400">前月比 <span className="font-semibold text-emerald-300">+3</span></span>
+        </div>
+      </section>
+
+      <section aria-labelledby="opinion-demographics-title" className="rounded-xl border border-white/10 bg-white/[0.025] p-3">
+        <h3 id="opinion-demographics-title" className="text-sm font-semibold text-white">世代・性別</h3>
+        <div className="mt-3 grid grid-cols-[3.5rem_minmax(0,1fr)_minmax(0,1fr)] gap-x-3 gap-y-2">
+          <span />
+          <span className="text-xs font-semibold text-sky-200">男性</span>
+          <span className="text-xs font-semibold text-pink-300">女性</span>
+          {opinionDemographics.map(({ label, male, female }) => (
+            <div key={label} className="contents">
+              <span className="self-center text-sm text-slate-300">{label}</span>
+              {[{ gender: '男性', value: male, color: 'bg-sky-400' }, { gender: '女性', value: female, color: 'bg-pink-400' }].map(({ gender, value, color }) => (
+                <div key={gender} className="flex min-w-0 items-center gap-2">
+                  <span className="w-7 shrink-0 text-right text-sm tabular-nums text-slate-200">{adjustedSupport(value)}</span>
+                  <div
+                    role="progressbar"
+                    aria-label={`${label}・${gender}の支持率`}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={adjustedSupport(value)}
+                    className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-800"
+                  >
+                    <div className={`h-full rounded-full ${color}`} style={{ width: `${adjustedSupport(value)}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {opinionGroups.map(({ title, groups }) => (
+          <section key={title} aria-label={title} className="rounded-xl border border-white/10 bg-white/[0.025] p-3">
+            <h3 className="text-sm font-semibold text-white">{title}</h3>
+            <div className="mt-3 space-y-3">
+              {groups.map((group) => <SupportBar key={group.label} {...group} />)}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      {[
+        { title: '各属性', groups: opinionAttributes },
+        { title: '業界別', groups: opinionIndustries },
+      ].map(({ title, groups }) => (
+        <section key={title} aria-label={title} className="rounded-xl border border-white/10 bg-white/[0.025] p-3">
+          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          <div className="mt-3 grid grid-cols-3 gap-x-3 gap-y-3 sm:grid-cols-6">
+            {groups.map(({ label, value }) => (
+              <SupportBar key={label} label={label} value={value} />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
   )
 }
 
@@ -628,7 +763,11 @@ function App() {
             aria-modal="true"
             aria-labelledby="details-title"
             onClick={(clickEvent) => clickEvent.stopPropagation()}
-            className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111827] p-4 shadow-2xl shadow-black/50"
+            className={`w-full rounded-2xl border border-white/10 bg-[#111827] shadow-2xl shadow-black/50 ${
+              activeModal === 'public'
+                ? 'max-h-[calc(100dvh-1rem)] max-w-3xl overflow-y-auto p-3 sm:max-h-[calc(100dvh-2rem)] sm:p-5'
+                : 'max-w-lg p-4'
+            }`}
           >
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -637,13 +776,17 @@ function App() {
                     ? 'あなたが選んだ公約'
                     : activeModal === 'phone'
                       ? '官邸から連絡'
-                      : '内閣指標の内訳'}
+                      : activeModal === 'public'
+                        ? '内閣の状況 · 世論'
+                        : '内閣指標の内訳'}
                 </p>
                 <h2 id="details-title" className="mt-1 text-xl font-bold text-white">
                   {activeModal === 'promises'
                     ? '公約一覧'
                     : activeModal === 'phone'
                       ? '電話する'
+                      : activeModal === 'public'
+                        ? '世論の状況'
                       : `${metrics.find((metric) => metric.key === activeModal)?.label}の状況`}
                 </h2>
               </div>
@@ -679,6 +822,8 @@ function App() {
                 ))}
                 <p className="text-xs text-slate-500">各アクションは今後のアップデートで利用可能になります。</p>
               </div>
+            ) : activeModal === 'public' ? (
+              <OpinionDetails support={status.public} />
             ) : (
               <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
                 <div className="flex items-baseline justify-between">
