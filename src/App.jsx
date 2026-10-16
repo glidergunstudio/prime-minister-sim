@@ -675,7 +675,7 @@ function App() {
       setCabinetAssignments((current) => ({ ...current, [currentPost]: candidate.id }))
     }
 
-    const completeCabinet = () => {
+    const reviewCabinet = () => {
       setCabinetAssignments((current) => {
         const remainingCandidates = cabinetCandidates.filter(
           (candidate) => !Object.values(current).includes(candidate.id),
@@ -691,7 +691,7 @@ function App() {
 
         return completed
       })
-      setScreen('office')
+      setScreen('cabinet-confirmation')
     }
 
     return (
@@ -707,10 +707,10 @@ function App() {
             </div>
             <button
               type="button"
-              onClick={completeCabinet}
+              onClick={reviewCabinet}
               className="shrink-0 rounded-xl bg-sky-400 px-4 py-2.5 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             >
-              組閣する
+              確認する
             </button>
           </header>
 
@@ -897,6 +897,75 @@ function App() {
             </section>
           </div>
         )}
+      </main>
+    )
+  }
+
+  if (screen === 'cabinet-confirmation') {
+    return (
+      <main className="min-h-screen bg-[#090d16] px-4 py-6 text-slate-100 sm:px-6">
+        <section className="mx-auto max-w-5xl">
+          <h1 className="text-3xl font-bold text-white">組閣内容の確認</h1>
+          <ol aria-label="組閣内容" className="mt-5 space-y-3">
+            {cabinetPosts.map((post) => {
+              const candidate = cabinetCandidates.find(
+                (member) => member.id === cabinetAssignments[post],
+              )
+
+              if (!candidate) return null
+
+              return (
+                <li
+                  key={post}
+                  className="flex flex-col gap-3 rounded-xl border border-white/10 bg-[#111827] p-3 md:flex-row-reverse md:items-center md:gap-4"
+                >
+                  <h2 className="w-full shrink-0 text-lg font-bold text-sky-200 md:w-36 md:text-right">
+                    {post}
+                  </h2>
+                  <CandidatePortrait
+                    candidate={candidate}
+                    className="h-16 w-16 shrink-0 self-center rounded-full md:self-auto"
+                  />
+                  <p className="shrink-0 text-center text-lg font-semibold text-white md:w-32 md:text-left">
+                    {candidate.name}
+                  </p>
+                  <div className="min-w-0 flex-1 text-center text-sm leading-6 text-slate-300 md:text-left">
+                    <p>{candidate.party}・{candidate.chamber}</p>
+                    <p>{candidate.district}・{candidate.experience}・{candidate.age}歳</p>
+                  </div>
+                  <dl className="grid shrink-0 grid-cols-3 gap-2 text-center text-xs md:w-52">
+                    {[
+                      { label: '影響力', value: candidate.influence },
+                      { label: '実務力', value: candidate.administration },
+                      { label: '答弁力', value: candidate.debate },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="rounded-lg bg-white/[0.04] px-2 py-2">
+                        <dt className="text-slate-400">{label}</dt>
+                        <dd className="mt-1 text-base font-semibold tabular-nums text-white">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </li>
+              )
+            })}
+          </ol>
+          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+            <button
+              type="button"
+              onClick={() => setScreen('cabinet')}
+              className="rounded-xl border border-white/15 px-5 py-3 font-semibold text-slate-200 transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              戻る
+            </button>
+            <button
+              type="button"
+              onClick={() => setScreen('office')}
+              className="rounded-xl bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            >
+              組閣する
+            </button>
+          </div>
+        </section>
       </main>
     )
   }
