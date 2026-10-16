@@ -1,0 +1,51 @@
+export const cabinetCandidates = [
+  {
+    id: 'aoi', name: '青井 さくら', district: '東京5区', experience: '当選6回',
+    party: '政和党', chamber: '衆議院', age: 52, portraitColor: '#31516b',
+    influence: 60, administration: 80, debate: 20,
+    note: '子育て支援策の立案を主導。党内の政策調整にも携わる。',
+    vetting: '政治資金収支報告の記載漏れを訂正済み。説明は完了している。',
+  },
+  {
+    id: 'kanda', name: '神田 健一', district: '大阪3区', experience: '当選4回',
+    party: '国民改革党', chamber: '衆議院', age: 61, portraitColor: '#66506e',
+    influence: 72, administration: 68, debate: 74,
+    note: '複数の党との協議をまとめた経験があり、調整力に優れる。',
+    vetting: '目立った問題は確認されていない。関係団体との会合記録を公開。',
+  },
+  {
+    id: 'mori', name: '森 由美子', district: '北海道選挙区', experience: '当選3回',
+    party: '政和党', chamber: '参議院', age: 48, portraitColor: '#49634e',
+    influence: 55, administration: 86, debate: 63,
+    note: '自治体の財政再建に関わった経験があり、行政実務に詳しい。',
+    vetting: '過去の発言を含め、懸念事項は確認されていない。',
+  },
+  {
+    id: 'sato', name: '佐藤 大輔', district: '福岡1区', experience: '当選5回',
+    party: '国民改革党', chamber: '衆議院', age: 54, portraitColor: '#755448',
+    influence: 81, administration: 59, debate: 70,
+    note: '幅広い党内人脈を持ち、地方組織との連携にも強い。',
+    vetting: '後援会の会計処理について確認済み。指摘事項への対応は完了。',
+  },
+  {
+    id: 'ishida', name: '石田 美咲', district: '京都府選挙区', experience: '当選2回',
+    party: 'みらい党', chamber: '参議院', age: 43, portraitColor: '#76576b',
+    influence: 68, administration: 73, debate: 88,
+    note: '広報分野の経験を生かした発信力に定評がある。',
+    vetting: '利害関係や過去の報道を確認。特段の懸念は見つかっていない。',
+  },
+  {
+    id: 'noda', name: '野田 誠', district: '民間出身', experience: '元企業経営者',
+    party: '無所属', chamber: '民間', age: 46, portraitColor: '#44677a',
+    influence: 74, administration: 77, debate: 58,
+    note: '企業経営と地域雇用の創出に携わり、民間の実務経験が豊富。',
+    vetting: '経営企業の取引関係と資産を確認。公職との利益相反はなし。',
+  },
+  {
+    id: 'suzuki', name: '鈴木 玲奈', district: '神奈川4区', experience: '当選2回',
+    party: 'みらい党', chamber: '衆議院', age: 39, portraitColor: '#6d6347',
+    influence: 62, administration: 82, debate: 76,
+    note: '社会保障分野の政策立案に詳しく、超党派の議論にも参加。',
+    vetting: '資金報告と公的発言を確認。現時点で問題は確認されていない。',
+  },
+]
