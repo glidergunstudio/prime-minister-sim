@@ -1398,12 +1398,12 @@ function App() {
       )}
 
       {isDecisionOpen && (
-        <div className="fixed inset-0 z-50 flex justify-center bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/40 p-4 backdrop-blur-sm">
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="decision-title"
-            className="h-[100dvh] w-full overflow-y-auto border border-white/10 bg-[#111827] p-3 shadow-2xl shadow-black/50 sm:p-5"
+            className="h-[90dvh] w-[90vw] overflow-y-auto rounded-xl border border-white/10 bg-[#111827] p-3 shadow-2xl shadow-black/50 sm:p-5"
           >
             <div>
               <p className="text-xs font-semibold tracking-[0.18em] text-rose-300">直面する課題 · {event.category}</p>
