@@ -585,7 +585,11 @@ function App() {
                 <>
                   <div className="rounded-xl border border-white/15 bg-slate-800/70 p-3">
                     <div className="flex items-start gap-3">
-                      <CandidatePortrait candidate={assignedCandidate} className="h-20 w-20 shrink-0 rounded-lg border border-white/15 sm:h-24 sm:w-24" />
+                      {assignedCandidate.portraitUrl ? (
+                        <img src={assignedCandidate.portraitUrl} alt={assignedCandidate.name} className="h-20 w-20 shrink-0 rounded-lg border border-white/15 object-cover sm:h-24 sm:w-24" />
+                      ) : (
+                        <CandidatePortrait candidate={assignedCandidate} className="h-20 w-20 shrink-0 rounded-lg border border-white/15 sm:h-24 sm:w-24" />
+                      )}
                       <div className="min-w-0">
                         <p className="font-bold text-white">{currentPost}</p>
                         <p className="mt-0.5 text-lg font-semibold text-slate-100">{assignedCandidate.name}</p>
@@ -673,7 +677,11 @@ function App() {
               {currentCandidate ? (
                 <div className="mt-3 rounded-xl border border-sky-200/20 bg-[#111827]/80 p-3">
                   <div className="flex items-start gap-3">
-                    <CandidatePortrait candidate={currentCandidate} className="h-20 w-20 shrink-0 rounded-lg border border-white/15 sm:h-24 sm:w-24" />
+                    {currentCandidate.portraitUrl ? (
+                      <img src={currentCandidate.portraitUrl} alt={currentCandidate.name} className="h-20 w-20 shrink-0 rounded-lg border border-white/15 object-cover sm:h-24 sm:w-24" />
+                    ) : (
+                      <CandidatePortrait candidate={currentCandidate} className="h-20 w-20 shrink-0 rounded-lg border border-white/15 sm:h-24 sm:w-24" />
+                    )}
                     <div className="min-w-0">
                       <p className="text-lg font-bold text-white">{currentCandidate.name}</p>
                       <p className="mt-0.5 text-sm text-slate-300">{currentCandidate.district}・{currentCandidate.experience}</p>
@@ -776,10 +784,14 @@ function App() {
                   <h2 className="w-full shrink-0 text-lg font-bold text-sky-200 md:w-36">
                     {post}
                   </h2>
-                  <CandidatePortrait
-                    candidate={candidate}
-                    className="h-16 w-16 shrink-0 self-center rounded-full md:self-auto"
-                  />
+                  {candidate.portraitUrl ? (
+                    <img src={candidate.portraitUrl} alt={candidate.name} className="h-16 w-16 shrink-0 self-center rounded-full object-cover md:self-auto" />
+                  ) : (
+                    <CandidatePortrait
+                      candidate={candidate}
+                      className="h-16 w-16 shrink-0 self-center rounded-full md:self-auto"
+                    />
+                  )}
                   <p className="shrink-0 text-center text-lg font-semibold text-white md:w-32 md:text-left">
                     {candidate.name}
                   </p>
