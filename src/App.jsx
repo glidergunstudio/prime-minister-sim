@@ -469,6 +469,7 @@ function App() {
     motivation: 50,
   })
   const [completedEventCount, setCompletedEventCount] = useState(0)
+  const [routineEventCount, setRoutineEventCount] = useState(0)
   const [history, setHistory] = useState(initialTimeline)
   const [eventIndex, setEventIndex] = useState(null)
   const [isDecisionOpen, setIsDecisionOpen] = useState(false)
@@ -493,14 +494,15 @@ function App() {
     if (screen !== 'office' || isDecisionOpen) return
 
     const intervalId = window.setInterval(() => {
-      const nextEventIndex = Math.floor(Math.random() * officeEvents.length)
-      const nextEvent = officeEvents[nextEventIndex]
-      if (nextEvent.choices) {
+      if (routineEventCount === 6) {
+        const nextEventIndex = Math.floor(Math.random() * events.length)
+        setRoutineEventCount(0)
         setEventIndex(nextEventIndex)
         setIsDecisionOpen(true)
         return
       }
 
+      const nextEvent = routineEvents[Math.floor(Math.random() * routineEvents.length)]
       setHistory((current) => [
         {
           turn: completedEventCount + 1,
@@ -512,10 +514,11 @@ function App() {
         ...current,
       ])
       setCompletedEventCount((current) => current + 1)
+      setRoutineEventCount((current) => current + 1)
     }, 10000 / gameSpeed)
 
     return () => window.clearInterval(intervalId)
-  }, [screen, isDecisionOpen, gameSpeed, completedEventCount, gameDate])
+  }, [screen, isDecisionOpen, gameSpeed, completedEventCount, routineEventCount, gameDate])
 
   useEffect(() => {
     if (!isSpinning) return
