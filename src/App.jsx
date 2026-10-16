@@ -1033,9 +1033,9 @@ function App() {
               return (
                 <li
                   key={post}
-                  className="flex flex-col gap-3 rounded-xl border border-white/10 bg-[#111827] p-3 md:flex-row-reverse md:items-center md:gap-4"
+                  className="flex flex-col gap-3 rounded-xl border border-white/10 bg-[#111827] p-3 md:flex-row md:items-center md:gap-4"
                 >
-                  <h2 className="w-full shrink-0 text-lg font-bold text-sky-200 md:w-36 md:text-right">
+                  <h2 className="w-full shrink-0 text-lg font-bold text-sky-200 md:w-36">
                     {post}
                   </h2>
                   <CandidatePortrait
@@ -1048,10 +1048,28 @@ function App() {
                   <div className="min-w-0 flex-1 text-center text-sm leading-6 text-slate-300 md:text-left">
                     <p>{candidate.party}・{candidate.chamber}</p>
                     <p>{candidate.district}・{candidate.experience}・{candidate.age}歳</p>
+                    <div className="mt-2 flex flex-wrap justify-center gap-2 md:justify-start">
+                      <button
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => setCabinetDetail({ candidate, type: 'biography' })}
+                        className="rounded-md border border-white/25 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      >
+                        略歴
+                      </button>
+                      <button
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => setCabinetDetail({ candidate, type: 'vetting' })}
+                        className="rounded-md border border-white/25 px-3 py-1 text-xs font-semibold text-slate-100 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      >
+                        身体検査
+                      </button>
+                    </div>
                   </div>
                   <dl className="grid shrink-0 grid-cols-3 gap-2 text-center text-xs md:w-52">
                     {[
-                      { label: '影響力', value: candidate.influence },
+                      { label: '人気', value: candidate.influence },
                       { label: '実務力', value: candidate.administration },
                       { label: '答弁力', value: candidate.debate },
                     ].map(({ label, value }) => (
