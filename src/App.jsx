@@ -219,6 +219,37 @@ const events = [
   },
 ]
 
+const routineEvents = [
+  {
+    category: '政務',
+    title: '閣議を開催',
+    description: '各大臣から政策の進捗について報告を受け、政府全体で課題を共有しました。',
+  },
+  {
+    category: '国民の声',
+    title: '地域の声を聞く',
+    description: '各地から寄せられた要望に目を通し、担当大臣に対応を指示しました。',
+  },
+  {
+    category: '外交',
+    title: '各国首脳と電話会談',
+    description: '国際情勢について意見を交わし、今後の連携を確認しました。',
+  },
+  {
+    category: '政務',
+    title: '政策の進捗を確認',
+    description: '重点政策の進み具合を確認し、関係省庁に引き続き取り組むよう伝えました。',
+  },
+]
+
+const officeEvents = [...events, ...routineEvents]
+const officeSeasons = {
+  spring: { skyTop: '#43524c', skyBottom: '#202c2a', windowSky: '#536b5b', city: '#526354', sun: '#f4c6c0' },
+  summer: { skyTop: '#31536c', skyBottom: '#152b3a', windowSky: '#31566d', city: '#385369', sun: '#f5d787' },
+  autumn: { skyTop: '#59433e', skyBottom: '#281f25', windowSky: '#654b44', city: '#55453f', sun: '#f2bd77' },
+  winter: { skyTop: '#39485f', skyBottom: '#171f30', windowSky: '#394b62', city: '#424d5d', sun: '#dbe9f7' },
+}
+
 const clamp = (value) => Math.min(100, Math.max(0, value))
 const metricLabels = Object.fromEntries(metrics.map(({ key, label }) => [key, label]))
 const getChoiceEffects = (choice) => ({
@@ -227,11 +258,6 @@ const getChoiceEffects = (choice) => ({
     choice.effects.motivation ??
     Math.round(((choice.effects.public ?? 0) + (choice.effects.party ?? 0)) / 2),
 })
-const getNextEventIndex = (currentIndex) => {
-  const nextEvents = events.map((_, index) => index).filter((index) => index !== currentIndex)
-  return nextEvents[Math.floor(Math.random() * nextEvents.length)]
-}
-
 const initialTimeline = [
   {
     turn: '就任初日',
@@ -265,7 +291,9 @@ const initialTimeline = [
   },
 ]
 
-function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice', idPrefix = 'office' }) {
+function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice', idPrefix = 'office', season = 'autumn' }) {
+  const colors = officeSeasons[season]
+
   return (
     <svg
       aria-hidden="true"
@@ -275,8 +303,8 @@ function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice',
     >
       <defs>
         <linearGradient id={`${idPrefix}-sky`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#223751" />
-          <stop offset="1" stopColor="#111b29" />
+          <stop offset="0" stopColor={colors.skyTop} />
+          <stop offset="1" stopColor={colors.skyBottom} />
         </linearGradient>
         <linearGradient id={`${idPrefix}-desk`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#624c3a" />
@@ -285,10 +313,10 @@ function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice',
       </defs>
       <path d="M0 0h640v228H0z" fill={`url(#${idPrefix}-sky)`} />
       <path d="M30 18h255v156H30z" fill="#101a28" stroke="#536174" strokeWidth="8" />
-      <path d="M42 30h231v132H42z" fill="#1b3045" />
+      <path d="M42 30h231v132H42z" fill={colors.windowSky} />
       <path d="M157 30v132M42 96h231" stroke="#536174" strokeWidth="5" />
-      <path d="M46 132h24V93h31v39h18V76h37v56h22v-30h32v30h19v-46h34v46h10v30H46z" fill="#26384a" />
-      <circle cx="224" cy="57" r="12" fill="#f2c779" opacity=".75" />
+      <path d="M46 132h24V93h31v39h18V76h37v56h22v-30h32v30h19v-46h34v46h10v30H46z" fill={colors.city} />
+      <circle cx="224" cy="57" r="12" fill={colors.sun} opacity=".75" />
       <path d="M307 24h275v157H307z" fill="#182334" stroke="#39495c" strokeWidth="5" />
       <path d="M337 49h213v94H337z" fill="#233448" />
       <path d="M353 74h181M353 95h181M353 116h134" stroke="#42566c" strokeWidth="5" opacity=".8" />
@@ -439,15 +467,54 @@ function App() {
     power: 50,
     motivation: 50,
   })
-  const [turn, setTurn] = useState(1)
+  const [completedEventCount, setCompletedEventCount] = useState(0)
   const [history, setHistory] = useState(initialTimeline)
-  const [eventIndex, setEventIndex] = useState(0)
+  const [eventIndex, setEventIndex] = useState(null)
   const [isDecisionOpen, setIsDecisionOpen] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
   const [gameSpeed, setGameSpeed] = useState(1)
-  const event = events[eventIndex]
-  const gameMonth = turn - 1
-  const gameDate = `${2025 + Math.floor(gameMonth / 12)}年${(gameMonth % 12) + 1}月`
+  const event = eventIndex === null ? null : officeEvents[eventIndex]
+  const gameMonth = 9 + Math.floor(completedEventCount / 5)
+  const gameYear = 2026 + Math.floor(gameMonth / 12)
+  const gameMonthInYear = (gameMonth % 12) + 1
+  const gameDate = `${gameYear}年${gameMonthInYear}月`
+  const season = gameMonthInYear >= 3 && gameMonthInYear <= 5
+    ? 'spring'
+    : gameMonthInYear >= 6 && gameMonthInYear <= 8
+      ? 'summer'
+      : gameMonthInYear >= 9 && gameMonthInYear <= 11
+        ? 'autumn'
+        : 'winter'
+  const isDietSession = gameMonthInYear <= 6
+  const tenureMonths = Math.floor(completedEventCount / 5) + 1
+
+  useEffect(() => {
+    if (screen !== 'office' || isDecisionOpen) return
+
+    const intervalId = window.setInterval(() => {
+      const nextEventIndex = Math.floor(Math.random() * officeEvents.length)
+      const nextEvent = officeEvents[nextEventIndex]
+      if (nextEvent.choices) {
+        setEventIndex(nextEventIndex)
+        setIsDecisionOpen(true)
+        return
+      }
+
+      setHistory((current) => [
+        {
+          turn: completedEventCount + 1,
+          date: gameDate,
+          category: nextEvent.category,
+          title: nextEvent.title,
+          detail: nextEvent.description,
+        },
+        ...current,
+      ])
+      setCompletedEventCount((current) => current + 1)
+    }, 10000 / gameSpeed)
+
+    return () => window.clearInterval(intervalId)
+  }, [screen, isDecisionOpen, gameSpeed, completedEventCount, gameDate])
 
   useEffect(() => {
     if (!isSpinning) return
@@ -983,7 +1050,8 @@ function App() {
     )
     setHistory((current) => [
       {
-        turn,
+        turn: completedEventCount + 1,
+        date: gameDate,
         category: event.category,
         title: event.title,
         choice: choice.label,
@@ -992,9 +1060,9 @@ function App() {
       },
       ...current,
     ])
-    setTurn((current) => current + 1)
+    setCompletedEventCount((current) => current + 1)
     setIsDecisionOpen(false)
-    setEventIndex(getNextEventIndex(eventIndex))
+    setEventIndex(null)
   }
 
   return (
@@ -1006,7 +1074,7 @@ function App() {
             <div className="flex flex-wrap items-center justify-end gap-1.5">
               <div className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1">
                 <span className="text-xs text-slate-400">在任</span>
-                <span className="ml-1.5 font-semibold tabular-nums text-white">{turn}ヶ月</span>
+                <span className="ml-1.5 font-semibold tabular-nums text-white">{tenureMonths}ヶ月</span>
               </div>
               <button
                 type="button"
@@ -1018,7 +1086,14 @@ function App() {
                 <span className="hidden text-amber-100/70 sm:inline">暮らしと未来を守る</span>
               </button>
             </div>
-            <span className="text-xs tabular-nums text-slate-400">ゲーム時間 {gameDate}</span>
+            <div className="flex items-center gap-1.5 text-xs tabular-nums text-slate-400">
+              {isDietSession && (
+                <span className="rounded-md border border-amber-300/25 bg-amber-300/10 px-1.5 py-0.5 font-semibold text-amber-200">
+                  国会会期中
+                </span>
+              )}
+              <span>{gameDate}</span>
+            </div>
           </div>
         </div>
       </header>
@@ -1030,7 +1105,7 @@ function App() {
               <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">首相官邸 · 執務室</p>
               <h2 className="mt-1 text-lg font-bold text-white sm:text-xl">国の未来を決める場所</h2>
             </div>
-            <OfficeIllustration className="absolute inset-x-0 bottom-0 h-4/5 w-full" />
+            <OfficeIllustration className="absolute inset-x-0 bottom-0 h-4/5 w-full" season={season} />
             <button
               type="button"
               onClick={() => setActiveModal('phone')}
@@ -1103,46 +1178,50 @@ function App() {
               <span className="h-4 w-1 rounded-full bg-rose-400" />
               <h2 className="text-sm font-bold tracking-wider text-slate-200">政権のタイムライン</h2>
             </div>
-            <span className="text-xs text-slate-500">{history.length + 1}件</span>
+            <span className="text-xs text-slate-500">{history.length + (event ? 1 : 0)}件</span>
           </div>
           <ol className="relative min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-white/10">
-            <li className="relative pl-10">
-              <span className="absolute left-[9px] top-5 size-3.5 rounded-full border-[3px] border-[#090d16] bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.55)]" />
-              <article className="rounded-xl border border-rose-400/20 bg-[#111827] p-2 sm:p-2.5">
-                <div className="flex flex-wrap items-center justify-between gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs font-semibold tabular-nums text-slate-500">TURN {String(turn).padStart(2, '0')}</span>
-                    <span className="rounded-full border border-white/10 px-1.5 py-0.5 text-[11px] text-slate-400">
-                      {event.category}
-                    </span>
+            {event ? (
+              <li className="relative pl-10">
+                <span className="absolute left-[9px] top-5 size-3.5 rounded-full border-[3px] border-[#090d16] bg-rose-400 shadow-[0_0_12px_rgba(251,113,133,0.55)]" />
+                <article className="rounded-xl border border-rose-400/30 bg-rose-400/[0.06] p-2 sm:p-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-bold tabular-nums text-rose-200">TURN {String(completedEventCount + 1).padStart(2, '0')}</span>
+                      <span className="rounded-full border border-rose-300/25 bg-rose-300/10 px-1.5 py-0.5 text-[11px] font-semibold text-rose-200">
+                        {event.category}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-bold tracking-wide text-rose-300">選択待ち</span>
                   </div>
-                  <span className="text-[11px] font-semibold tracking-wide text-rose-300">対応待ち</span>
-                </div>
-                <h3 className="mt-1.5 text-lg font-bold text-white">{event.title}</h3>
-                <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-400">{event.description}</p>
-                <button
-                  type="button"
-                  onClick={() => setIsDecisionOpen(true)}
-                  className="mt-2 rounded-lg border border-sky-400/30 bg-sky-400/[0.08] px-2 py-1 text-sm font-semibold text-sky-200 transition hover:border-sky-300/60 hover:bg-sky-400/[0.14] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-                >
-                  議題を確認して判断する <span aria-hidden="true">→</span>
-                </button>
-              </article>
-            </li>
+                  <h3 className="mt-1.5 text-lg font-extrabold text-rose-100">{event.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-300">{event.description}</p>
+                  <p className="mt-2 text-xs font-semibold text-rose-200">選択モーダルで対応してください</p>
+                </article>
+              </li>
+            ) : (
+              <li className="relative pl-10">
+                <span className="absolute left-[10px] top-4 size-3 rounded-full border-2 border-[#090d16] bg-slate-600" />
+                <p className="rounded-xl border border-white/[0.07] bg-[#0e1420] px-2.5 py-2 text-xs text-slate-500">
+                  次のイベントを待っています
+                </p>
+              </li>
+            )}
             {history.map((item) => (
               <li key={`${item.turn}-${item.title}`} className="relative pl-10">
-                <span className="absolute left-[10px] top-5 size-3 rounded-full border-2 border-[#090d16] bg-violet-400" />
-                <article className="rounded-xl border border-white/[0.07] bg-[#0e1420] px-2 py-2 sm:px-2.5">
+                <span className={`absolute left-[10px] top-5 size-3 rounded-full border-2 border-[#090d16] ${item.isDecision ? 'bg-rose-400' : 'bg-violet-400'}`} />
+                <article className={`rounded-xl px-2 py-2 sm:px-2.5 ${item.isDecision ? 'border border-rose-400/15 bg-rose-400/[0.035]' : 'border border-white/[0.07] bg-[#0e1420]'}`}>
                   <div className="flex flex-wrap items-center gap-1">
                     <span className="text-xs font-semibold tabular-nums text-slate-500">
                       {item.isDecision ? `TURN ${String(item.turn).padStart(2, '0')}` : item.turn}
                     </span>
+                    {item.date && <span className="text-[11px] tabular-nums text-slate-500">{item.date}</span>}
                     <span className="text-[11px] text-slate-500">{item.category}</span>
-                    <span className="ml-auto rounded-full bg-emerald-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+                    <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${item.isDecision ? 'bg-rose-400/10 text-rose-300' : 'bg-emerald-400/10 text-emerald-300'}`}>
                       {item.isDecision ? '決定済み' : '実施済み'}
                     </span>
                   </div>
-                  <h3 className="mt-1 text-sm font-semibold text-slate-200">{item.title}</h3>
+                  <h3 className={`mt-1 text-sm ${item.isDecision ? 'font-bold text-rose-100' : 'font-semibold text-slate-200'}`}>{item.title}</h3>
                   <p className="mt-0.5 text-xs leading-5 text-slate-400">
                     {item.choice ? `${item.choice} — ` : ''}{item.detail}
                   </p>
@@ -1250,37 +1329,19 @@ function App() {
       )}
 
       {isDecisionOpen && (
-        <div
-          className="fixed inset-0 z-50 flex justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setIsDecisionOpen(false)}
-        >
+        <div className="fixed inset-0 z-50 flex justify-center bg-black/80 backdrop-blur-sm">
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="decision-title"
-            onClick={(clickEvent) => clickEvent.stopPropagation()}
-            onKeyDown={(keyEvent) => {
-              if (keyEvent.key === 'Escape') setIsDecisionOpen(false)
-            }}
             className="h-[100dvh] w-full overflow-y-auto border border-white/10 bg-[#111827] p-3 shadow-2xl shadow-black/50 sm:p-5"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.18em] text-rose-300">直面する課題 · {event.category}</p>
-                <h2 id="decision-title" className="mt-1 text-xl font-bold text-white sm:text-2xl">{event.title}</h2>
-              </div>
-              <button
-                type="button"
-                autoFocus
-                onClick={() => setIsDecisionOpen(false)}
-                aria-label="閉じる"
-                className="flex size-9 shrink-0 items-center justify-center rounded-full border border-white/10 text-lg text-slate-400 transition hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-sky-400"
-              >
-                ×
-              </button>
+            <div>
+              <p className="text-xs font-semibold tracking-[0.18em] text-rose-300">直面する課題 · {event.category}</p>
+              <h2 id="decision-title" className="mt-1 text-xl font-bold text-white sm:text-2xl">{event.title}</h2>
             </div>
             <div className="relative mt-3 aspect-[640/280] w-full overflow-hidden rounded-xl border border-white/10">
-              <OfficeIllustration className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" idPrefix="decision-office" />
+              <OfficeIllustration className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" idPrefix="decision-office" season={season} />
             </div>
             <p className="mt-3 text-sm leading-7 text-slate-300">{event.description}</p>
             <div className="mt-4">
@@ -1290,6 +1351,7 @@ function App() {
                   <div key={choice.label} className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.025]">
                     <button
                       type="button"
+                      autoFocus={index === 0}
                       onClick={() => makeDecision(choice)}
                       className="group flex w-full items-start gap-2 p-3 text-left transition hover:bg-sky-400/[0.06] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-sky-400"
                     >
