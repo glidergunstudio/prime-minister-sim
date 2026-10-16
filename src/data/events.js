@@ -4,6 +4,7 @@ export const events = [
     title: '痛みを伴う改革',
     description:
       '膨らみ続ける社会保障費を抑えるため、給付の見直しが避けられません。将来世代への責任を果たす一方で、生活への影響を懸念する声が広がっています。',
+    sceneOverride: { timeOfDay: 'night', mood: 'crisis', activeObjects: ['daruma'] },
     choices: [
       {
         label: '給付を見直し、財政再建を急ぐ',
