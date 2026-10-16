@@ -9,13 +9,13 @@ import {
   opinionDemographics,
   opinionGroups,
   opinionIndustries,
-  officeSeasons,
   primeMinisterNames,
   profileFields,
   promiseOptions,
 } from './data/constants.js'
 import { cabinetCandidates } from './data/candidates.js'
 import { events, officeEvents, routineEvents } from './data/events.js'
+import OfficeView from './components/OfficeView.jsx'
 
 const clamp = (value) => Math.min(100, Math.max(0, value))
 const metricLabels = Object.fromEntries(metrics.map(({ key, label }) => [key, label]))
@@ -25,47 +25,6 @@ const getChoiceEffects = (choice) => ({
     choice.effects.motivation ??
     Math.round(((choice.effects.public ?? 0) + (choice.effects.party ?? 0)) / 2),
 })
-
-function OfficeIllustration({ className, preserveAspectRatio = 'xMidYMax slice', idPrefix = 'office', season = 'autumn' }) {
-  const colors = officeSeasons[season]
-
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 640 280"
-      className={className}
-      preserveAspectRatio={preserveAspectRatio}
-    >
-      <defs>
-        <linearGradient id={`${idPrefix}-sky`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={colors.skyTop} />
-          <stop offset="1" stopColor={colors.skyBottom} />
-        </linearGradient>
-        <linearGradient id={`${idPrefix}-desk`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#624c3a" />
-          <stop offset="1" stopColor="#332b27" />
-        </linearGradient>
-      </defs>
-      <path d="M0 0h640v228H0z" fill={`url(#${idPrefix}-sky)`} />
-      <path d="M30 18h255v156H30z" fill="#101a28" stroke="#536174" strokeWidth="8" />
-      <path d="M42 30h231v132H42z" fill={colors.windowSky} />
-      <path d="M157 30v132M42 96h231" stroke="#536174" strokeWidth="5" />
-      <path d="M46 132h24V93h31v39h18V76h37v56h22v-30h32v30h19v-46h34v46h10v30H46z" fill={colors.city} />
-      <circle cx="224" cy="57" r="12" fill={colors.sun} opacity=".75" />
-      <path d="M307 24h275v157H307z" fill="#182334" stroke="#39495c" strokeWidth="5" />
-      <path d="M337 49h213v94H337z" fill="#233448" />
-      <path d="M353 74h181M353 95h181M353 116h134" stroke="#42566c" strokeWidth="5" opacity=".8" />
-      <path d="M0 205h640v75H0z" fill="#101722" />
-      <path d="M62 193h518l-34 48H98z" fill={`url(#${idPrefix}-desk)`} />
-      <path d="M118 241h28v39h-28zm380 0h28v39h-28z" fill="#342a25" />
-      <path d="M421 161v40" stroke="#b8c4d5" strokeWidth="3" />
-      <path d="M424 163h38v26h-38z" fill="#f7f4ed" />
-      <circle cx="443" cy="176" r="7" fill="#c94b50" />
-      <path d="M211 207h119l13 15H197z" fill="#171e28" />
-      <path d="M227 191h86v16h-86z" fill="#29384a" />
-    </svg>
-  )
-}
 
 function CandidatePortrait({ candidate, className = '' }) {
   return (
@@ -222,6 +181,7 @@ function App() {
       : gameMonthInYear >= 9 && gameMonthInYear <= 11
         ? 'autumn'
         : 'winter'
+  const sceneOverride = event?.sceneOverride
   const isDietSession = gameMonthInYear <= 6
   const tenureMonths = Math.floor(completedEventCount / 5) + 1
 
@@ -921,7 +881,14 @@ function App() {
               <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">首相官邸 · 執務室</p>
               <h2 className="mt-1 text-lg font-bold text-white sm:text-xl">国の未来を決める場所</h2>
             </div>
-            <OfficeIllustration className="absolute inset-x-0 bottom-0 h-4/5 w-full" season={season} />
+            <div className="absolute inset-x-0 bottom-0 h-4/5 w-full">
+              <OfficeView
+                season={season}
+                timeOfDay={sceneOverride?.timeOfDay ?? 'day'}
+                mood={sceneOverride?.mood ?? 'normal'}
+                activeObjects={sceneOverride?.activeObjects ?? []}
+              />
+            </div>
             <button
               type="button"
               onClick={() => setActiveModal('phone')}
@@ -1157,7 +1124,12 @@ function App() {
               <h2 id="decision-title" className="mt-1 text-xl font-bold text-white sm:text-2xl">{event.title}</h2>
             </div>
             <div className="relative mt-3 aspect-[640/280] w-full overflow-hidden rounded-xl border border-white/10">
-              <OfficeIllustration className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" idPrefix="decision-office" season={season} />
+              <OfficeView
+                season={season}
+                timeOfDay={sceneOverride?.timeOfDay ?? 'day'}
+                mood={sceneOverride?.mood ?? 'normal'}
+                activeObjects={sceneOverride?.activeObjects ?? []}
+              />
             </div>
             <p className="mt-3 text-sm leading-7 text-slate-300">{event.description}</p>
             <div className="mt-4">
