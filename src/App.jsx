@@ -455,7 +455,7 @@ function App() {
     const field = profileFields[currentProfileIndex]
     const intervalId = window.setInterval(() => {
       setRollingValue(field.options[Math.floor(Math.random() * field.options.length)])
-    }, 90)
+    }, 45)
     const timeoutId = window.setTimeout(() => {
       const selectedValue = field.options[Math.floor(Math.random() * field.options.length)]
       setRollingValue(selectedValue)
@@ -464,7 +464,7 @@ function App() {
       if (currentProfileIndex === profileFields.length - 1) {
         setIsSpinning(false)
       }
-    }, 1400)
+    }, 700)
 
     return () => {
       window.clearInterval(intervalId)
@@ -507,25 +507,26 @@ function App() {
     const allProfileFieldsSelected = currentProfileIndex === profileFields.length
 
     return (
-      <main className="min-h-screen bg-[#090d16] px-4 py-8 text-slate-100 sm:px-6">
+      <main className="min-h-screen bg-[#090d16] px-4 py-4 text-slate-100 sm:px-6">
         <section className="mx-auto max-w-2xl">
-          <label htmlFor="prime-minister-name" className="mb-2 block text-sm font-semibold text-white">
-            総理大臣の名前
-          </label>
-          <input
-            id="prime-minister-name"
-            type="text"
-            value={primeMinisterName}
-            onChange={(changeEvent) => setPrimeMinisterName(changeEvent.target.value)}
-            className="mb-6 w-full rounded-xl border border-white/15 bg-[#111827] px-4 py-3 text-base text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-          />
-          <p className="text-xs font-semibold tracking-[0.2em] text-sky-200/70">総理プロフィール</p>
-          <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">あなたの総理像を決める</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            ルーレットを回して、総理としての背景や特性を決めましょう。
-          </p>
+          <header className="mb-3">
+            <h1 className="text-lg font-bold text-white">プロフィール設定</h1>
+            <p className="mt-1 text-sm text-slate-400">ルーレットを回してプロフィールを決定</p>
+          </header>
+          <div className="mb-3 flex items-center gap-3">
+            <label htmlFor="prime-minister-name" className="shrink-0 text-sm font-semibold text-white">
+              名前
+            </label>
+            <input
+              id="prime-minister-name"
+              type="text"
+              value={primeMinisterName}
+              onChange={(changeEvent) => setPrimeMinisterName(changeEvent.target.value)}
+              className="min-w-0 flex-1 rounded-xl border border-white/15 bg-[#111827] px-3 py-2 text-base text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            />
+          </div>
 
-          <ol className="mt-6 space-y-2">
+          <ol className="mt-3 space-y-1.5">
             {profileFields.map((field, index) => {
               const isCurrentField = index === currentProfileIndex
               const isSelected = profile[field.key] !== undefined
@@ -538,7 +539,7 @@ function App() {
               return (
                 <li
                   key={field.key}
-                  className={`flex min-h-16 items-center justify-between gap-4 rounded-xl border px-4 py-3 ${
+                  className={`flex min-h-[3.2rem] items-center justify-between gap-4 rounded-xl border px-3 py-2 ${
                     isCurrentField ? 'border-sky-400/40 bg-sky-400/[0.06]' : 'border-white/10 bg-white/[0.025]'
                   }`}
                 >
@@ -560,7 +561,7 @@ function App() {
             <button
               type="button"
               onClick={() => setScreen('values')}
-              className="mt-6 w-full rounded-lg bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              className="mt-4 w-full rounded-lg bg-sky-400 px-5 py-2.5 font-bold text-slate-950 transition hover:bg-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             >
               理念・公約を選ぶ
             </button>
@@ -569,7 +570,7 @@ function App() {
               type="button"
               disabled={isSpinning}
               onClick={() => setIsSpinning(true)}
-              className="mt-6 w-full rounded-lg border border-sky-400/40 bg-sky-400/10 px-5 py-3 font-semibold text-sky-200 transition hover:bg-sky-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-60"
+              className="mt-4 w-full rounded-lg border border-sky-400/40 bg-sky-400/10 px-5 py-2.5 font-semibold text-sky-200 transition hover:bg-sky-400/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 disabled:cursor-wait disabled:opacity-60"
             >
               {isSpinning ? '抽選中…' : 'すべてのルーレットを回す'}
             </button>
