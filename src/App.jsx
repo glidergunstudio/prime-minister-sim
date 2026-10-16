@@ -673,8 +673,6 @@ function App() {
       if (!candidate) return
 
       setCabinetAssignments((current) => ({ ...current, [currentPost]: candidate.id }))
-      setCabinetCandidateId(null)
-      setCabinetPostIndex((index) => (index + 1) % cabinetPosts.length)
     }
 
     const completeCabinet = () => {
@@ -721,7 +719,10 @@ function App() {
               <button
                 type="button"
                 aria-label="前の大臣ポスト"
-                onClick={() => setCabinetPostIndex((index) => (index - 1 + cabinetPosts.length) % cabinetPosts.length)}
+                onClick={() => {
+                  setCabinetCandidateId(null)
+                  setCabinetPostIndex((index) => (index - 1 + cabinetPosts.length) % cabinetPosts.length)
+                }}
                 className="rounded-full border border-white/15 px-3 py-1.5 text-xl text-slate-200 hover:bg-white/10"
               >
                 ←
@@ -744,7 +745,10 @@ function App() {
               <button
                 type="button"
                 aria-label="次の大臣ポスト"
-                onClick={() => setCabinetPostIndex((index) => (index + 1) % cabinetPosts.length)}
+                onClick={() => {
+                  setCabinetCandidateId(null)
+                  setCabinetPostIndex((index) => (index + 1) % cabinetPosts.length)
+                }}
                 className="rounded-full border border-white/15 px-3 py-1.5 text-xl text-slate-200 hover:bg-white/10"
               >
                 →
@@ -833,17 +837,16 @@ function App() {
                   <div className="flex items-center gap-3">
                     <CandidatePortrait candidate={currentCandidate} className="h-16 w-16 shrink-0 rounded-full" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-lg font-bold text-white">{currentCandidate.name}</p>
+                      <p className="flex flex-wrap items-baseline gap-x-2 text-lg font-bold text-white">
+                        <span>{currentCandidate.name}</span>
+                        <span className="text-sm font-normal text-slate-300">{currentCandidate.age}歳</span>
+                      </p>
                       <p className="mt-1 text-sm text-slate-300">{currentCandidate.district}・{currentCandidate.experience}</p>
+                      <p className="text-sm text-slate-300">{currentCandidate.party}・{currentCandidate.chamber}</p>
                     </div>
                     <span className="shrink-0 text-sm font-semibold text-sky-200">
                       {cabinetCandidateId === currentCandidate.id ? '選択中' : '選択する'}
                     </span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-                    <span className="rounded-full bg-white/5 px-2 py-1 text-slate-300">政党：{currentCandidate.party}</span>
-                    <span className="rounded-full bg-white/5 px-2 py-1 text-slate-300">所属院：{currentCandidate.chamber}</span>
-                    <span className="rounded-full bg-white/5 px-2 py-1 text-slate-300">年齢：{currentCandidate.age}歳</span>
                   </div>
                   <div className="mt-2 grid grid-cols-3 gap-2 text-center text-sm">
                     <p><span className="block text-slate-400">影響力</span>{currentCandidate.influence}</p>
